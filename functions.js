@@ -36,6 +36,7 @@ if (_G.loadedFiles[filePath] == null) {
     };
 
     _G.clearScreen = function () {
+        print("_G.clearScreen: ", widgetStack.length);
         for (var i = widgetStack.length - 1; i >= 0; --i) {
             _G.hide(widgetStack[i]);
             Map.remove(widgetStack[i].widget);
@@ -57,19 +58,25 @@ if (_G.loadedFiles[filePath] == null) {
         return function (params) { fn(self, params); };
     };
 
-    _G.horizontals = function (widgets) {
+    _G.horizontals = function (widgets, NoHstretch) {
         var panel = ui.Panel();
         panel.setLayout(ui.Panel.Layout.flow("horizontal"));
         for (var i = 0; i < widgets.length; ++i) {
+            if (!NoHstretch) {
+                widgets[i].style().set("stretch", "horizontal");
+            }
             panel.add(widgets[i]);
         }
         return panel;
     }
 
-    _G.verticals = function (widgets) {
+    _G.verticals = function (widgets, NoVstretch) {
         var panel = ui.Panel();
         panel.setLayout(ui.Panel.Layout.flow("vertical"));
         for (var i = 0; i < widgets.length; ++i) {
+            if (!NoVstretch) {
+                widgets[i].style().set("stretch", "vertical");
+            }
             panel.add(widgets[i]);
         }
         return panel;

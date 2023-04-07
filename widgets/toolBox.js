@@ -1,4 +1,9 @@
-var sr = require("users/sunriverkun/gee_test:functions.js");
+var _G = Number.prototype._G;
+//监督分类
+
+
+//非监督分类
+var CobwebScreen = require("users/sunriverkun/gee_test:screens/cobwebScreen.js");
 
 var SubMenu = {};
 SubMenu.new = function (str) {
@@ -10,7 +15,7 @@ SubMenu.new = function (str) {
         isOpen: true,
 
     };
-    var widget = ui.Button("- ", sr.handler(self, SubMenu.onClick));
+    var widget = ui.Button("- ", _G.handler(self, SubMenu.onClick));
     self.widget = widget;
     SubMenu.setOpen(self, self.isOpen);
     return self;
@@ -58,15 +63,15 @@ MenuItem.new = function (str, screenCls) {
         widget: null,
         screenCls: screenCls
     };
-    var widget = ui.Button(str, sr.handler(self, MenuItem.onClick));
+    var widget = ui.Button(str, _G.handler(self, MenuItem.onClick));
     self.widget = widget;
     return self;
 };
 
 MenuItem.onClick = function (self){
     var screen = self.screenCls.new()
-    sr.clearScreen();
-    sr.pushScreen(screen);
+    _G.clearScreen();
+    _G.pushScreen(screen);
 };
 
 function addMenuItem(menuItem, subMenu, panel) {
@@ -89,6 +94,6 @@ exports.new = function () {
 
     var clusterMenu = SubMenu.new("非监督分类");
     panel.add(clusterMenu.widget);
-    addMenuItem(MenuItem.new("cobWeb", null), clusterMenu, panel);
+    addMenuItem(MenuItem.new("cobWeb", CobwebScreen), clusterMenu, panel);
     return self;
 };
