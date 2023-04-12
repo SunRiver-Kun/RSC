@@ -6,7 +6,7 @@ var _G = Number.prototype._G;
 var CobwebScreen = require("users/sunriverkun/gee_test:screens/cobwebScreen.js");
 
 var SubMenu = {};
-SubMenu.new = function (str) {
+SubMenu.new = function (str, color) {
     var self = {
         c: SubMenu,
         widget: null,
@@ -16,6 +16,7 @@ SubMenu.new = function (str) {
 
     };
     var widget = ui.Button("- ", _G.handler(self, SubMenu.onClick));
+    if(color) { widget.style().set("color", color); }
     self.widget = widget;
     SubMenu.setOpen(self, self.isOpen);
     return self;
@@ -88,11 +89,11 @@ exports.new = function () {
 
     };
     panel.setLayout(ui.Panel.Layout.flow("vertical"));
-    var classifyMenu = SubMenu.new("监督分类");
+    var classifyMenu = SubMenu.new("监督分类", "orange");
     panel.add(classifyMenu.widget);
     addMenuItem(MenuItem.new("decisionTree", null), classifyMenu, panel);
 
-    var clusterMenu = SubMenu.new("非监督分类");
+    var clusterMenu = SubMenu.new("非监督分类", "orange");
     panel.add(clusterMenu.widget);
     addMenuItem(MenuItem.new("cobWeb", CobwebScreen), clusterMenu, panel);
     return self;
