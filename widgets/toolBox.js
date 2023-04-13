@@ -3,7 +3,7 @@ var _G = Number.prototype._G;
 
 
 //非监督分类
-var CobwebScreen = require("users/sunriverkun/gee_test:screens/cobwebScreen.js");
+var KMeansScreen = require("users/sunriverkun/gee_test:screens/kMeansScreen.js");
 
 var SubMenu = {};
 SubMenu.new = function (str, color) {
@@ -95,6 +95,6 @@ exports.new = function () {
 
     var clusterMenu = SubMenu.new("非监督分类", "orange");
     panel.add(clusterMenu.widget);
-    addMenuItem(MenuItem.new("cobWeb", CobwebScreen), clusterMenu, panel);
+    addMenuItem(MenuItem.new("kMeans", KMeansScreen), clusterMenu, panel);
     return self;
 };

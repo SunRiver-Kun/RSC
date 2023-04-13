@@ -4,6 +4,8 @@ if (_G.loadedFiles[filePath] == null) {
     _G.loadedFiles[filePath] = exports;
     print("Load " + filePath);
 
+    var MapDrawScreen = require("users/sunriverkun/gee_test:screens/mapDrawScreen.js");
+
     exports.new = function () {
         var panel = ui.Panel();
         panel.setLayout(ui.Panel.Layout.flow("vertical"));
@@ -28,19 +30,39 @@ if (_G.loadedFiles[filePath] == null) {
         if (self.argsWidget) { self.argsPanel.add(self.argsWidget); }
         panel.add(self.argsPanel);
         //train参数
-        self.subsamplingLabel = ui.Label("二次抽样系数");
-        self.subsamplingSlider = ui.Slider(0.1, 1, 1, 0.1);
-        panel.add(_G.horizontals([self.subsamplingLabel, self.subsamplingSlider]));
+        // self.subsamplingLabel = ui.Label("二次抽样系数");
+        // self.subsamplingSlider = ui.Slider(0.1, 1, 1, 0.1);
+        // panel.add(_G.horizontals([self.subsamplingLabel, self.subsamplingSlider]));
 
-        self.subsamplingSeedLabel = ui.Label("二次抽样种子(整数)");
-        self.subsamplingSeedTex = ui.Textbox("默认0", "0");
-        panel.add(_G.horizontals([self.subsamplingSeedLabel, self.subsamplingSeedTex]));
+        // self.subsamplingSeedLabel = ui.Label("二次抽样种子(整数)");
+        // self.subsamplingSeedTex = ui.Textbox("默认0", "0");
+        // panel.add(_G.horizontals([self.subsamplingSeedLabel, self.subsamplingSeedTex]));
+        //选择训练区域
+        self.region = null;
+        self.regionButton = ui.Button("绘制", _G.handler(self, exports.openMapDrawScreen));
+        self.regionLabel = ui.Label("");
+        exports.setRegion(self, null);
+        panel.add(_G.horizontals([ui.Label("绘制训练区域"),self.regionButton, self.regionLabel]));
 
         //分类，取消
         self.classButton = ui.Button("分类", _G.handler(self, exports.onClass));
         self.cancelButton = ui.Button("取消", function () { _G.popScreen(); });
         panel.add(_G.horizontals([self.classButton, self.cancelButton]));
         return self;
+    }
+
+    exports.setRegion = function (self, region) {
+        self.region = region;
+        self.regionLabel.setValue(region == null ? "X" : "√");
+    }
+
+    exports.openMapDrawScreen = function (self) {
+        _G.addLayer(self.imageNameTex.getValue(), true);
+        var mapDrawScreen = MapDrawScreen.new("请绘制训练区域", function (geoLayers) {
+            var length = geoLayers.length();
+            exports.setRegion(self, length > 0 ? geoLayers.get(length - 1).toGeometry() : null);
+        })
+        _G.pushScreen(mapDrawScreen);
     }
 
     exports.onClass = function (self) {
