@@ -96,6 +96,25 @@ if (_G.loadedFiles[filePath] == null) {
         return number;
     };
 
+    _G.Astr2UInt = function (str, alertStr) {
+        var number = parseInt(str);
+        if (isNaN(number) || number < 0) {
+            alert(alertStr);
+            return null;
+        }
+        return number;
+    };
+
+
+    _G.Astr2PInt = function (str, alertStr) {
+        var number = parseInt(str);
+        if (isNaN(number) || number < 1) {
+            alert(alertStr);
+            return null;
+        }
+        return number;
+    };
+
     _G.Astr2Float = function (str, alertStr) {
         var number = parseFloat(str);
         if (isNaN(number)) {
