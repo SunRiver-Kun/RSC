@@ -63,7 +63,7 @@ if (_G.loadedFiles[filePath] == null) {
         }).train(training);
         var result = input.cluster(clusterer).randomVisualizer();
         print("result", result);
-        Map.addLayer(result, {}, "CascadeKMeans");
+        Map.addLayer(result, {}, "XMeans");
     };
 
 } else {

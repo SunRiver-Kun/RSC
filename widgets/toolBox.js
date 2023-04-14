@@ -5,7 +5,7 @@ var _G = Number.prototype._G;
 //非监督分类
 var KMeansScreen = require("users/sunriverkun/gee_test:screens/kMeansScreen.js");
 var XMeansScreen = require("users/sunriverkun/gee_test:screens/xMeansScreen.js");
-var CascadeKMeansScreen = require("users/sunriverkun/gee_test:screens/cascadeKMeansScreen.js");
+var LVQScreen = require("users/sunriverkun/gee_test:screens/lVQScreen.js");
 
 var SubMenu = {};
 SubMenu.new = function (str, color) {
@@ -99,6 +99,7 @@ exports.new = function () {
     panel.add(clusterMenu.widget);
     addMenuItem(MenuItem.new("kMeans", KMeansScreen), clusterMenu, panel);
     addMenuItem(MenuItem.new("XMeans", XMeansScreen), clusterMenu, panel);
-    addMenuItem(MenuItem.new("CascadeKMeans", CascadeKMeansScreen), clusterMenu, panel);
+    addMenuItem(MenuItem.new("LVQ", LVQScreen), clusterMenu, panel);
+
     return self;
 };
