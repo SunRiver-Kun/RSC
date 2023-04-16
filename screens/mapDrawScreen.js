@@ -11,9 +11,7 @@ if (_G.loadedFiles[filePath] == null) {
             c: exports,
             widget: panel
         };
-        var geoLayers = Map.drawingTools().layers();
-        self.beforeGeoLayers = geoLayers.getJsArray();
-        geoLayers.reset();
+        Map.drawingTools().layers().reset();
 
         exports.setOnFinish(self, onFinishCb);
 
@@ -32,7 +30,7 @@ if (_G.loadedFiles[filePath] == null) {
     }
 
     exports.pop = function (self) {
-        Map.drawingTools().layers().reset(self.beforeGeoLayers);
+        Map.drawingTools().layers().reset();
         _G.popScreen(self);
     }
 
