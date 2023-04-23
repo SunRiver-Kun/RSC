@@ -6,5 +6,8 @@ require("users/sunriverkun/gee_test:functions.js");
 
 var ToolBox = require("users/sunriverkun/gee_test:widgets/toolBox.js");
 var toolBox = ToolBox.new();
-toolBox.widget.style().set("position", "top-right");
+toolBox.widget.style().set({
+    position : "middle-right",
+    margin  : "20px"
+});
 Map.add(toolBox.widget);

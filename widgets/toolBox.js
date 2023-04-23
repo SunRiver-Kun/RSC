@@ -7,57 +7,8 @@ var KMeansScreen = require("users/sunriverkun/gee_test:screens/kMeansScreen.js")
 var XMeansScreen = require("users/sunriverkun/gee_test:screens/xMeansScreen.js");
 var LVQScreen = require("users/sunriverkun/gee_test:screens/lVQScreen.js");
 
-var SubMenu = {};
-SubMenu.new = function (str, color) {
-    var self = {
-        c: SubMenu,
-        widget: null,
-        children: [],
-        str: str,
-        isOpen: true,
-
-    };
-    var widget = ui.Button("- ", _G.handler(self, SubMenu.onClick));
-    if(color) { widget.style().set("color", color); }
-    self.widget = widget;
-    SubMenu.setOpen(self, self.isOpen);
-    return self;
-};
-
-SubMenu.onClick = function (self) {
-    SubMenu.setOpen(self, !self.isOpen);
-};
-
-SubMenu.getShowStr = function (self) {
-    return (self.isOpen ? "- " : "+ ") + self.str;
-}
-
-SubMenu.setStr = function (self, str) {
-    self.str = str;
-    self.widget.setLabel(SubMenu.getShowStr(self));
-}
-
-SubMenu.setOpen = function (self, isOpen) {
-    self.isOpen = isOpen;
-    self.widget.setLabel(SubMenu.getShowStr(self));
-    for(var i=0; i<self.children.length; ++i){
-      self.children[i].style().set("shown", isOpen);
-    }
-};
-
-SubMenu.addChild = function (self, child) {
-    self.children.push(child);
-    child.style().set("shown", self.isOpen);
-}
-
-SubMenu.removeChild = function (self, child) {
-    var children = self.children;
-    for (var i = 0; i < children.length; ++i) {
-        if (children[i] === child) {
-            return children.splice(i, 1);
-        }
-      }
-}
+//Widget
+var SubMenu = require("users/sunriverkun/gee_test:widgets/subMenu.js");
 
 var MenuItem = {};
 MenuItem.new = function (str, screenCls) {
@@ -77,29 +28,28 @@ MenuItem.onClick = function (self){
     _G.pushScreen(screen);
 };
 
-function addMenuItem(menuItem, subMenu, panel) {
-    SubMenu.addChild(subMenu, menuItem.widget);
-    panel.add(menuItem.widget);
+function addMenuItem(menuItem, subMenu) {
+    SubMenu.add(subMenu, menuItem.widget);
 }
 
-
 exports.new = function () {
-    var panel = ui.Panel();
+    var panel = ui.Panel(null, ui.Panel.Layout.flow("vertical"), {
+        backgroundColor: "FFFFFF5F"
+    });
     var self = {
         c: exports,
-        widget: panel,
-
+        widget: panel
     };
-    panel.setLayout(ui.Panel.Layout.flow("vertical"));
-    var classifyMenu = SubMenu.new("监督分类", "orange");
-    panel.add(classifyMenu.widget);
-    addMenuItem(MenuItem.new("decisionTree", null), classifyMenu, panel);
 
-    var clusterMenu = SubMenu.new("非监督分类", "orange");
+    var classifyMenu = SubMenu.new("监督分类");
+    panel.add(classifyMenu.widget);
+    addMenuItem(MenuItem.new("decisionTree", null), classifyMenu);
+
+    var clusterMenu = SubMenu.new("非监督分类");
     panel.add(clusterMenu.widget);
-    addMenuItem(MenuItem.new("kMeans", KMeansScreen), clusterMenu, panel);
-    addMenuItem(MenuItem.new("XMeans", XMeansScreen), clusterMenu, panel);
-    addMenuItem(MenuItem.new("LVQ", LVQScreen), clusterMenu, panel);
+    addMenuItem(MenuItem.new("kMeans", KMeansScreen), clusterMenu);
+    addMenuItem(MenuItem.new("XMeans", XMeansScreen), clusterMenu);
+    addMenuItem(MenuItem.new("LVQ", LVQScreen), clusterMenu);
 
     return self;
 };
