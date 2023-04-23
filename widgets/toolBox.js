@@ -41,6 +41,22 @@ exports.new = function () {
         widget: panel
     };
 
+    //标题
+    var titlePanel = ui.Panel(null, ui.Panel.Layout.flow("horizontal"), {
+        backgroundColor : "FFFFFFAF",
+        margin : "-10px -6px 0px -6px",
+        //padding : "0px 10px"
+    });
+    titlePanel.add(ui.Label("💼工具栏", {
+        fontSize : "20px",
+        backgroundColor: "FFFFFF00"
+    }));
+    titlePanel.add(ui.Button("> >    ++++++++++", _G.handler(self, exports.hide), undefined, {
+        width : "27px"
+    }));
+    panel.add(titlePanel);
+
+    //内容
     var classifyMenu = SubMenu.new("监督分类");
     panel.add(classifyMenu.widget);
     addMenuItem(MenuItem.new("decisionTree", null), classifyMenu);
@@ -53,3 +69,19 @@ exports.new = function () {
 
     return self;
 };
+
+exports.isShown = function (self) {
+    return self.widget.style().get("shown");
+}
+
+exports.setShown = function (self, shown) {
+    self.widget.style().set("shown", shown);
+}
+
+exports.show = function (self) {
+    exports.setShown(self, true);
+}
+
+exports.hide = function (self) {
+    exports.setShown(self, false);
+}

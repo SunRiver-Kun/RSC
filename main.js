@@ -7,7 +7,14 @@ require("users/sunriverkun/gee_test:functions.js");
 var ToolBox = require("users/sunriverkun/gee_test:widgets/toolBox.js");
 var toolBox = ToolBox.new();
 toolBox.widget.style().set({
-    position : "middle-right",
-    margin  : "20px"
+    position : "top-right",
 });
+
+var toolBoxButton = ui.Button("工具栏", function () { ToolBox.show(toolBox); }, undefined, { 
+    position : "top-right",
+    padding : "0px",
+    margin : "150px"
+});
+
+Map.add(toolBoxButton);
 Map.add(toolBox.widget);
