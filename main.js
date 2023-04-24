@@ -6,5 +6,4 @@ require("users/sunriverkun/gee_test:functions.js");
 
 var Hud = require("users/sunriverkun/gee_test:screens/hud.js");
 _G.hud = Hud.new();
-ui.root.clear();
-ui.root.add(_G.hud.widget);
+_G.map = _G.hud.map;

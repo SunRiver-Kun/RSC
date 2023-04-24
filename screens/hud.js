@@ -7,10 +7,9 @@ if (_G.loadedFiles[filePath] == null) {
     var ToolBox = require("users/sunriverkun/gee_test:widgets/toolBox.js");
 
     exports.new = function () {
-        var panel = ui.Panel(null, ui.Panel.Layout.flow("horizontal"), {
-            width: "100%",
-            height: "100%"
-        });
+        var panel = ui.root;
+        ui.root.setLayout(ui.Panel.Layout.flow("horizontal"));
+
         var self = {
             c: exports,
             widget: panel
@@ -25,14 +24,13 @@ if (_G.loadedFiles[filePath] == null) {
         self.leftTotalPanel.add(_G.horizontals([self.leftEscButton, self.leftBackButton], true));
         self.leftTotalPanel.add(self.leftPanel);
 
-        self.map = ui.Map();
+        self.map = Map;
 
         self.rightStack = {};  //name : {button  screen}
         self.rightTotalPanel = ui.Panel(null, ui.Panel.Layout.flow("horizontal"));
         exports.addRightWidget(self, "💼工具栏", ToolBox.new(), true);
 
-        panel.add(self.leftTotalPanel);
-        panel.add(self.map);
+        panel.insert(0, self.leftTotalPanel);
         panel.add(self.rightTotalPanel);
 
         return self;
