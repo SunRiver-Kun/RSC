@@ -8,7 +8,7 @@ if (_G.loadedFiles[filePath] == null) {
 
     exports.new = function () {
         var panel = _G.verticals();
-        var self = ClusterBaseScreen.new();
+        var self = ClusterBaseScreen.new("XMeans");
         self.base = self.c;
         self.c = exports;
 

@@ -8,7 +8,7 @@ if (_G.loadedFiles[filePath] == null) {
 
     exports.new = function () {
         var panel = _G.verticals();
-        var self = ClusterBaseScreen.new();
+        var self = ClusterBaseScreen.new("kMeans");
         self.base = self.c;
         self.c = exports;
 
@@ -38,8 +38,6 @@ if (_G.loadedFiles[filePath] == null) {
 
         var maxIterations = parseInt(self.maxIterationsTex.getValue());
         if (isNaN(maxIterations) || maxIterations<1) { maxIterations = null; }
-        
-        if (self.region == null) { alert("未绘制训练区域"); return; }
 
         var input = ee.Image(imageName);
         print("input", input);

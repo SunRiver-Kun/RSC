@@ -8,7 +8,7 @@ if (_G.loadedFiles[filePath] == null) {
 
     exports.new = function () {
         var panel = _G.verticals();
-        var self = ClusterBaseScreen.new();
+        var self = ClusterBaseScreen.new("LVQ");
         self.base = self.c;
         self.c = exports;
 
@@ -37,8 +37,6 @@ if (_G.loadedFiles[filePath] == null) {
         var numClusters = _G.Astr2PInt(self.numClustersTex.getValue(), "聚类数应为正整数");
         var learningRate = self.learningRateTex.getValue();
         var epochs = _G.Astr2PInt(self.epochsTex.getValue(), "训练期应为正整数");
-
-        if (self.region == null) { alert("未绘制训练区域"); }
 
         if (imageName == "" || numClusters == null || learningRate == null || epochs==null) {
             print("分类失败，参数错误");

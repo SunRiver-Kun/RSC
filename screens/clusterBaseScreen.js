@@ -4,7 +4,7 @@ if (_G.loadedFiles[filePath] == null) {
     _G.loadedFiles[filePath] = exports;
     print("Load " + filePath);
 
-    var MapDrawScreen = require("users/sunriverkun/gee_test:screens/mapDrawScreen.js");
+    var MapDrawer = require("users/sunriverkun/gee_test:widgets/mapDrawer.js");
 
     exports.new = function (name) {
         var panel = ui.Panel();
@@ -61,14 +61,15 @@ if (_G.loadedFiles[filePath] == null) {
     }
 
     exports.openMapDrawScreen = function (self) {
-        _G.addLayer(self.imageNameTex.getValue(), true);
-        var mapDrawScreen = MapDrawScreen.new("请绘制训练区域", function (geoLayers) {
+        _G.addLayerOrHideBefore(self.imageNameTex.getValue(), true);
+        var mapDrawScreen = MapDrawer.new("请绘制训练区域", function (geoLayers) {
             var length = geoLayers.length();
             exports.setRegion(self, length > 0 ? geoLayers.get(length - 1).toGeometry() : null);
         })
     }
 
     exports.onClass = function (self) {
+        _G.addLayerOrHideBefore(self.imageNameTex.getValue(), true);
         if (self.onClass) { self.onClass(self); }
     }
 

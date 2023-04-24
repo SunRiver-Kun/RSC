@@ -50,7 +50,7 @@ if (_G.loadedFiles[filePath] == null) {
             panel.add(widgets[i]);
         }
         return panel;
-    }
+    };
 
     _G.verticals = function (widgets, NoVstretch) {
         var panel = ui.Panel();
@@ -64,7 +64,7 @@ if (_G.loadedFiles[filePath] == null) {
             panel.add(widgets[i]);
         }
         return panel;
-    }
+    };
 
     //转换
     _G.Astr2Int = function (str, alertStr) {
@@ -105,26 +105,51 @@ if (_G.loadedFiles[filePath] == null) {
     };
 
     //地图
+    var imageParams = {
+        LANDSAT: { bands: ["B4", "B3", "B2"], min: 0, max: 3000 }
+    };
     _G.addLayer = function (imageName, focus) {
-        var image = null;
-        if (imageName.indexOf("LANDSAT") != -1) {
-            image = ee.Image(imageName);
-            Map.addLayer(image, { bands: ["B4", "B3", "B2"], min: 0, max: 3000 }, imageName);
-        } else {
-            print("[ERROR]: 未知类型图像名 " + imageName);
-            return null;
+        if (imageName == null || imageName == "") { print("[ERROR]: _G.addLayer null imageName"); return null; }
+        for (var type in imageParams) {
+            if (imageName.indexOf(type) != -1) {
+                var image = ee.Image(imageName);
+                var layer = Map.addLayer(image, imageParams[type], imageName);
+                if (focus) { Map.centerObject(image); }
+                return layer;
+            }
         }
-        if (focus) { Map.centerObject(image); }
-        return image;
-    }
+        print("[ERROR]: _G.addLayer unknow type of " + imageName);
+        return null;
+    };
+
+    _G.addLayerOrHideBefore = function (imageName, focus) {
+        if (imageName == null || imageName == "") { print("[ERROR]: _G.addLayerOrHideBefore null imageName"); return null; }
+
+        var layers = Map.layers();
+        var index = null;
+        for (var i = 0; i < layers.length(); ++i) {
+            if (layers.get(i).getName() == imageName) {
+                index = i;
+                break;
+            }
+        }
+        if (index != null) {
+            for (var i = index + 1; i < layers.length(); ++i) { layers.get(i).setShown(false); }
+            layers.get(index).setShown(true);
+            if (focus) { Map.centerObject(layers.get(index).getEeObject()); }
+            return layers.get(index);
+        } else {
+            return _G.addLayer(imageName, focus);
+        }
+    };
 
     //颜色
     var palette = [];
     _G.getPalette = function (count) {
         var arr = [];
         var length = palette.length;
-        for(var i=0; i<count; ++i){
-            arr.push( i < length ? palette[i] : _G.getRandomColor());
+        for (var i = 0; i < count; ++i) {
+            arr.push(i < length ? palette[i] : _G.getRandomColor());
         }
         return arr;
     };
@@ -132,7 +157,7 @@ if (_G.loadedFiles[filePath] == null) {
     _G.getRandomColor = function () {
         var color = "#";
         var length = 6;
-        for(var i=0; i<length; ++i){
+        for (var i = 0; i < length; ++i) {
             color += Math.floor(Math.random() * 16).toString(16).toUpperCase();
         }
         return color;
