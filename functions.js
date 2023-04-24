@@ -4,47 +4,26 @@ if (_G.loadedFiles[filePath] == null) {
     _G.loadedFiles[filePath] = _G;
     print("Load " + filePath);
 
-    var widgetStack = [];
-
+    //TheFrontEnd
     _G.getWidgetStack = function () {
-        return widgetStack;
+        return _G.hud.leftStack;
     };
 
     _G.pushScreen = function (screen) {
         print("_G.pushScreen: ", screen);
-        if (widgetStack.length > 0) {
-            _G.hide(widgetStack[widgetStack.length - 1]);
-        }
-        _G.show(screen);
-        widgetStack.push(screen);
-        Map.add(screen.widget);
+        _G.hud.c.pushLeftScreen(_G.hud, screen);
     };
 
-    _G.popScreen = function (self) {
-        if (self != undefined && self != widgetStack[widgetStack.length - 1]) { return; }
-        var screen = widgetStack.pop();
-        print("_G.popScreen: ", screen);
-        _G.hide(screen);
-        Map.remove(screen.widget);
-        if (widgetStack.length > 0) {
-            _G.show(widgetStack[widgetStack.length - 1]);
-        }
-        return screen;
-    };
-
-    _G.topScreen = function () {
-        return widgetStack[widgetStack.length - 1];
+    _G.popScreen = function (screen) {
+        _G.hud.c.popLeftScreen(_G.hud, screen);
     };
 
     _G.clearScreen = function () {
-        print("_G.clearScreen: ", widgetStack.length);
-        for (var i = widgetStack.length - 1; i >= 0; --i) {
-            _G.hide(widgetStack[i]);
-            Map.remove(widgetStack[i].widget);
-            widgetStack.pop();
-        }
+        _G.hud.c.clearLeftScreen(_G.hud);
     };
 
+
+    //UI
     _G.show = function (widget) {
         if (widget.widget != null) { widget = widget.widget; }
         widget.style().set("shown", true);
@@ -87,6 +66,7 @@ if (_G.loadedFiles[filePath] == null) {
         return panel;
     }
 
+    //转换
     _G.Astr2Int = function (str, alertStr) {
         var number = parseInt(str);
         if (isNaN(number)) {
@@ -124,6 +104,7 @@ if (_G.loadedFiles[filePath] == null) {
         return number;
     };
 
+    //地图
     _G.addLayer = function (imageName, focus) {
         var image = null;
         if (imageName.indexOf("LANDSAT") != -1) {
@@ -136,6 +117,26 @@ if (_G.loadedFiles[filePath] == null) {
         if (focus) { Map.centerObject(image); }
         return image;
     }
+
+    //颜色
+    var palette = [];
+    _G.getPalette = function (count) {
+        var arr = [];
+        var length = palette.length;
+        for(var i=0; i<count; ++i){
+            arr.push( i < length ? palette[i] : _G.getRandomColor());
+        }
+        return arr;
+    };
+
+    _G.getRandomColor = function () {
+        var color = "#";
+        var length = 6;
+        for(var i=0; i<length; ++i){
+            color += Math.floor(Math.random() * 16).toString(16).toUpperCase();
+        }
+        return color;
+    };
 }
 else {
 

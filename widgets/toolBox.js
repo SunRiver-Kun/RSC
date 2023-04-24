@@ -34,27 +34,12 @@ function addMenuItem(menuItem, subMenu) {
 
 exports.new = function () {
     var panel = ui.Panel(null, ui.Panel.Layout.flow("vertical"), {
-        backgroundColor: "FFFFFF5F"
+        //backgroundColor: "FFFFFF5F"
     });
     var self = {
         c: exports,
         widget: panel
     };
-
-    //标题
-    var titlePanel = ui.Panel(null, ui.Panel.Layout.flow("horizontal"), {
-        backgroundColor : "FFFFFFAF",
-        margin : "-10px -6px 0px -6px",
-        //padding : "0px 10px"
-    });
-    titlePanel.add(ui.Label("💼工具栏", {
-        fontSize : "20px",
-        backgroundColor: "FFFFFF00"
-    }));
-    titlePanel.add(ui.Button("> >    ++++++++++", _G.handler(self, exports.hide), undefined, {
-        width : "27px"
-    }));
-    panel.add(titlePanel);
 
     //内容
     var classifyMenu = SubMenu.new("监督分类");
