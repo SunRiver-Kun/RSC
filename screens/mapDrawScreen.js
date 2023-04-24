@@ -22,6 +22,8 @@ if (_G.loadedFiles[filePath] == null) {
         self.cancelButton = ui.Button("取消", _G.handler(self, exports.onCancel));
         panel.add(self.cancelButton);
 
+        Map.add(self.widget);
+
         return self;
     };
 
@@ -31,7 +33,7 @@ if (_G.loadedFiles[filePath] == null) {
 
     exports.pop = function (self) {
         Map.drawingTools().layers().reset();
-        _G.popScreen(self);
+        Map.remove(self.widget);
     }
 
     exports.onFinish = function (self) {
