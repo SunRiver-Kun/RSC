@@ -22,7 +22,7 @@ MenuItem.new = function (str, screenCls) {
     return self;
 };
 
-MenuItem.onClick = function (self){
+MenuItem.onClick = function (self) {
     var screen = self.screenCls.new()
     _G.clearScreen();
     _G.pushScreen(screen);
@@ -42,11 +42,12 @@ exports.new = function () {
     };
 
     //内容
-    var classifyMenu = SubMenu.new("监督分类");
+    var subPanelStyle = { margin: "0px 0px auto 10%" };
+    var classifyMenu = SubMenu.new("📁监督分类", undefined ,subPanelStyle);
     panel.add(classifyMenu.widget);
     addMenuItem(MenuItem.new("decisionTree", null), classifyMenu);
 
-    var clusterMenu = SubMenu.new("非监督分类");
+    var clusterMenu = SubMenu.new("📁非监督分类", undefined, subPanelStyle);
     panel.add(clusterMenu.widget);
     addMenuItem(MenuItem.new("kMeans", KMeansScreen), clusterMenu);
     addMenuItem(MenuItem.new("XMeans", XMeansScreen), clusterMenu);

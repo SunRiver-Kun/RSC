@@ -4,22 +4,25 @@ if (_G.loadedFiles[filePath] == null) {
     _G.loadedFiles[filePath] = exports;
     print("Load " + filePath);
 
-    exports.new = function (str) {
-        var panel = ui.Panel(null, ui.Panel.Layout.flow("vertical"), {
-            backgroundColor: "FFFFFF00",
-        });
+    exports.new = function (str, btnStyle, subPanelStyle, panelStyle) {
+
+        var panel = ui.Panel(null, ui.Panel.Layout.flow("vertical"), panelStyle);
 
         var self = {
             c: exports,
             widget: panel,
-            panel : ui.Panel(null, ui.Panel.Layout.flow("vertical"), {
-                backgroundColor: "FFFFFF00",
-                margin : "0px 0px auto 10%"
-            }),
-            str : str ? str :"subMenu"
+            panel: ui.Panel(null, ui.Panel.Layout.flow("vertical"), subPanelStyle),
+            str: str ? str : "subMenu"
         };
-        
-        self.button = ui.Button("", _G.handler(self, exports.onClick));
+        if ((typeof str) == "string") {
+            self.openStr = "- " + str;
+            self.closeStr = "+ " + str;
+        } else {
+            self.openStr = str.openStr;
+            self.closeStr = str.closeStr;
+        }
+
+        self.button = ui.Button("", _G.handler(self, exports.onClick), undefined, btnStyle);
         panel.add(self.button);
         panel.add(self.panel);
 
@@ -33,7 +36,7 @@ if (_G.loadedFiles[filePath] == null) {
 
     exports.setIsOpen = function (self, isopen) {
         self.panel.style().set("shown", isopen);
-        self.button.setLabel( (isopen ? "-" : "+") + " 📁"  + self.str);
+        self.button.setLabel(isopen ? self.openStr : self.closeStr);
     }
 
     exports.setStr = function (self, str) {
@@ -42,12 +45,12 @@ if (_G.loadedFiles[filePath] == null) {
     }
 
     exports.add = function (self, widget) {
-        if(widget.widget) { widget = widget.widget; }
+        if (widget.widget) { widget = widget.widget; }
         self.panel.add(widget);
     }
 
     exports.remove = function (self, widget) {
-        if(widget.widget) { widget = widget.widget; }
+        if (widget.widget) { widget = widget.widget; }
         self.panel.remove(widget);
     }
 
