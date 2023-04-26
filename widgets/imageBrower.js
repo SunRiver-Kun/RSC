@@ -5,6 +5,8 @@ if (_G.loadedFiles[filePath] == null) {
     print("Load " + filePath);
 
     var MapDrawer = require("users/sunriverkun/gee_test:widgets/mapDrawer.js");
+    var SubMenu = require("users/sunriverkun/gee_test:widgets/subMenu.js");
+
     var provinceNames = null;
     var provincesData = ee.FeatureCollection("projects/ee-sunriverkun/assets/china_province"); //省区
     provincesData.aggregate_array("省区").evaluate(function (list) { provinceNames = list; });
@@ -29,14 +31,17 @@ if (_G.loadedFiles[filePath] == null) {
         };
         defaultType = defaultType ? defaultType : "Landsat-8-T1_SR";
 
+        var menu = null;
+        var titleStyle = _G.styles.title;
         //类型
         self.cltTypes = collectionTypes;
         self.cltTypeDesLabel = ui.Label(collectionTypes[defaultType].des != null ? collectionTypes[defaultType].des : "", _G.styles.des);
         self.cltTypeSelect = ui.Select(Object.keys(self.cltTypes), "图像来源", defaultType, _G.handler(self, exports.onImageCollectionChange));
 
-        panel.add(ui.Label("图像来源", _G.styles.title));
-        panel.add(self.cltTypeDesLabel);
-        panel.add(self.cltTypeSelect);
+        menu = SubMenu.new("🧾图像来源", titleStyle);
+        panel.add(menu.widget);
+        SubMenu.add(menu, self.cltTypeDesLabel);
+        SubMenu.add(menu, self.cltTypeSelect);
         //地区
         self.customArea = null;
         self.customAreaButotn = ui.Button("绘制区域", _G.handler(self, exports.onCustomAreaButotnClick));
@@ -46,36 +51,40 @@ if (_G.loadedFiles[filePath] == null) {
         self.cityTex = ui.Textbox("以；分割不同市", "");
         self.cityButton = ui.Button("补全", _G.handler(self, exports.onCityButtonClick));
 
-        panel.add(ui.Label("研究区域", _G.styles.title));
-        panel.add(ui.Label("选择自定义/省/市一种或多种做为遥感图像覆盖的区域", _G.styles.des));
-        panel.add(_G.horizontals([ui.Label("自定义"), self.customAreaButotn, self.areaPreviewButton], true));
-        panel.add(_G.horizontals([ui.Label("+ 省"), self.provinceTex, self.provinceButton], true));
-        panel.add(_G.horizontals([ui.Label("+ 市"), self.cityTex, self.cityButton], true));
+        menu = SubMenu.new("🎨研究区域", titleStyle);
+        panel.add(menu.widget);
+        SubMenu.add(menu, ui.Label("选择自定义/省/市一种或多种做为遥感图像覆盖的区域", _G.styles.des));
+        SubMenu.add(menu, _G.horizontals([ui.Label("自定义"), self.customAreaButotn, self.areaPreviewButton], true));
+        SubMenu.add(menu, _G.horizontals([ui.Label("+ 省"), self.provinceTex, self.provinceButton], true));
+        SubMenu.add(menu, _G.horizontals([ui.Label("+ 市"), self.cityTex, self.cityButton], true));
         //时间
         self.startTimeTex = ui.Textbox("YYYY-MM-DD", "2015-01-01");
         self.endTimeTex = ui.Textbox("YYYY-MM-DD", "2022-12-31")
 
-        panel.add(ui.Label("起止时间", _G.styles.title));
-        panel.add(ui.Label("输入格式为YYYY-MM-DD, 例如：2015-01-01", _G.styles.des));
-        panel.add(_G.horizontals([ui.Label("开始时间"), self.startTimeTex], true));
-        panel.add(_G.horizontals([ui.Label("结束时间"), self.endTimeTex], true));
+        menu = SubMenu.new("📅起止时间", titleStyle);
+        panel.add(menu.widget);
+        SubMenu.add(menu, ui.Label("输入格式为YYYY-MM-DD, 例如：2015-01-01", _G.styles.des));
+        SubMenu.add(menu, _G.horizontals([ui.Label("开始时间"), self.startTimeTex], true));
+        SubMenu.add(menu, _G.horizontals([ui.Label("结束时间"), self.endTimeTex], true));
         //云量
         self.cloudTex = ui.Textbox("0~100", "5", null, false, { width: "40px" });
 
-        panel.add(ui.Label("云量占比", _G.styles.title));
-        panel.add(ui.Label("云量占比越大云越多, 0~100的整数", _G.styles.des));
-        panel.add(_G.horizontals([ui.Label("云量占比小于等于"), self.cloudTex], true));
+        menu = SubMenu.new("⛅云量占比", titleStyle);
+        panel.add(menu.widget);
+        SubMenu.add(menu, ui.Label("云量占比越大云越多, 0~100的整数", _G.styles.des));
+        SubMenu.add(menu, _G.horizontals([ui.Label("云量占比小于等于"), self.cloudTex], true));
 
         //单 or 复
         self.imgTypeSelect = ui.Select(["单张图像", "拼接图像"], "请选择图像类型", null, _G.handler(self, exports.onImageTypeChange));
         self.singlePanel = ui.Panel();
         self.mosaicPanel = ui.Panel();
 
-        panel.add(ui.Label("影像选择", _G.styles.title));
-        panel.add(ui.Label("选择单张影像或拼接影像", _G.styles.des));
-        panel.add(self.imgTypeSelect);
-        panel.add(self.singlePanel);
-        panel.add(self.mosaicPanel);
+        menu = SubMenu.new("💾影像选择", titleStyle);
+        panel.add(menu.widget);
+        SubMenu.add(menu, ui.Label("选择单张影像或拼接影像", _G.styles.des));
+        SubMenu.add(menu, self.imgTypeSelect);
+        SubMenu.add(menu, self.singlePanel);
+        SubMenu.add(menu, self.mosaicPanel);
         //default
 
 
