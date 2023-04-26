@@ -143,6 +143,15 @@ if (_G.loadedFiles[filePath] == null) {
         }
     };
 
+    _G.rawAddLayerOrReplaceTop = function (eeObject, visParams, name, shown, opacity) {
+        var layers = Map.layers();
+        if(layers.length() > 0 && name!=null && name!=""){
+            var elm = layers.get(layers.length()-1);
+            if(elm.getName() == name) { layers.remove(elm); }
+        } 
+        return Map.addLayer(eeObject, visParams, name, shown, opacity);
+    }
+
     //颜色
     var palette = [];
     _G.getPalette = function (count) {
