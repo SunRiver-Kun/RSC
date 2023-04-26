@@ -35,7 +35,7 @@ if (_G.loadedFiles[filePath] == null) {
     };
 
     _G.handler = function (self, fn) {
-        return function (params) { fn(self, params); };
+        return function (arg1, arg2, arg3, arg4) { fn(self, arg1, arg2, arg3, arg4); };
     };
 
     _G.horizontals = function (widgets, NoHstretch) {

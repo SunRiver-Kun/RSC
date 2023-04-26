@@ -4,6 +4,7 @@ _G.loadedFiles = {};    //加载过的文件列表，避免require时多次执�
 _G.styles = require("users/sunriverkun/gee_test:styles.js");
 
 require("users/sunriverkun/gee_test:functions.js");
+require("users/sunriverkun/gee_test:string.js");
 
 var Hud = require("users/sunriverkun/gee_test:screens/hud.js");
 _G.hud = Hud.new();

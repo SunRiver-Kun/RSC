@@ -53,29 +53,29 @@ if (_G.loadedFiles[filePath] == null) {
         self.cancelButton = ui.Button("取消", function () { _G.popScreen(); });
         panel.add(_G.horizontals([self.classButton, self.cancelButton]));
         return self;
-    }
+    };
 
     exports.setRegion = function (self, region) {
         self.region = region;
         self.regionLabel.setValue(region == null ? "(全部)" : "(部分)");
-    }
+    };
 
     exports.openMapDrawScreen = function (self) {
         _G.addLayerOrHideBefore(self.imageNameTex.getValue(), true);
         var mapDrawScreen = MapDrawer.new("请绘制训练区域", function (geoLayers) {
             var length = geoLayers.length();
             exports.setRegion(self, length > 0 ? geoLayers.get(length - 1).toGeometry() : null);
-        })
-    }
+        }, null, true);
+    };
 
     exports.onClass = function (self) {
         _G.addLayerOrHideBefore(self.imageNameTex.getValue(), true);
         if (self.onClass) { self.onClass(self); }
-    }
+    };
 
     exports.setOnClass = function (self, fn) {
         self.onClass = fn;
-    }
+    };
 
     exports.setArgsWidget = function (self, argsWidget) {
         self.argsWidget = argsWidget;
@@ -83,7 +83,7 @@ if (_G.loadedFiles[filePath] == null) {
             self.argsPanel.clear();
             self.argsPanel.add(argsWidget);
         }
-    }
+    };
 
 } else {
     exports = _G.loadedFiles[filePath];

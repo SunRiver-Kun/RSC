@@ -4,17 +4,18 @@ if (_G.loadedFiles[filePath] == null) {
     _G.loadedFiles[filePath] = exports;
     print("Load " + filePath);
 
-    exports.new = function (helpStr, onFinishCb, onCancelCb) {
+    exports.new = function (helpStr, onFinishCb, onCancelCb, resetLayer) {
         var panel = ui.Panel();
         panel.setLayout(ui.Panel.Layout.flow("horizontal"));
         var self = {
             c: exports,
             widget: panel
         };
-        Map.drawingTools().layers().reset();
 
         exports.setOnFinish(self, onFinishCb);
         exports.setOnCancel(self, onCancelCb);
+        self.resetLayer = resetLayer;
+        if(self.resetLayer) { Map.drawingTools().layers().reset(); }
 
         self.helpLabel = ui.Label(helpStr!=undefined ? helpStr : "请使用左上角的绘图工具绘制几何体");
         panel.add(self.helpLabel);
@@ -37,7 +38,7 @@ if (_G.loadedFiles[filePath] == null) {
      }
 
     exports.pop = function (self) {
-        Map.drawingTools().layers().reset();
+        if(self.resetLayer) { Map.drawingTools().layers().reset(); }
         Map.remove(self.widget);
     }
 
