@@ -17,7 +17,7 @@ if (_G.loadedFiles[filePath] == null) {
         panel.add(_G.horizontals([self.minClustersLabel, self.minClustersTex]));
 
         self.maxClustersLabel = ui.Label("最大聚类数");
-        self.maxClustersTex = ui.Textbox("默认10", "10");
+        self.maxClustersTex = ui.Textbox("默认6", "6");
         panel.add(_G.horizontals([self.maxClustersLabel, self.maxClustersTex]));
 
         self.maxIterationsLabel = ui.Label("最大迭代次数");
@@ -31,7 +31,7 @@ if (_G.loadedFiles[filePath] == null) {
         return self;
     };
 
-    exports.onClass = function (self) {
+    exports.onClass = function (self, image) {
         var imageName = self.imageNameTex.getValue();
         if (imageName == "") { alert("遥感图像名不应为空"); }
         var minClusters = _G.Astr2PInt(self.minClustersTex.getValue(), "最小聚类数应为正整数");
@@ -40,15 +40,13 @@ if (_G.loadedFiles[filePath] == null) {
         var maxIterations = parseInt(self.maxIterationsTex.getValue());
         if (isNaN(maxIterations) || maxIterations < 1) { maxIterations = null; }
 
-        if (self.region == null) { alert("未绘制训练区域"); }
-
         if (imageName == "" || minClusters == null || maxClusters == null) {
             print("分类失败，参数错误");
             return;
         }
         if (minClusters > maxClusters) { alert("最小聚类数不应大于最大聚类数"); return; }
 
-        var input = ee.Image(imageName);
+        var input = image != null ? image : ee.Image(imageName);
         print("input", input);
         var training = input.sample({
             region: self.region,

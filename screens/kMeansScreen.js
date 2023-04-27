@@ -27,19 +27,17 @@ if (_G.loadedFiles[filePath] == null) {
         return self;
     };
 
-
-
-    exports.onClass = function (self) {
+    exports.onClass = function (self, image) {
         var imageName = self.imageNameTex.getValue();
         if (imageName == "") { alert("遥感图像名不应为空"); return; }
 
         var nClusters = parseInt(self.nClustersTex.getValue());
-        if(isNaN(nClusters) || nClusters<1){ alert("聚类数应为正整数"); return; }
+        if (isNaN(nClusters) || nClusters < 1) { alert("聚类数应为正整数"); return; }
 
         var maxIterations = parseInt(self.maxIterationsTex.getValue());
-        if (isNaN(maxIterations) || maxIterations<1) { maxIterations = null; }
+        if (isNaN(maxIterations) || maxIterations < 1) { maxIterations = null; }
 
-        var input = ee.Image(imageName);
+        var input = image != null ? image : ee.Image(imageName);
         print("input", input);
         var training = input.sample({
             region: self.region,

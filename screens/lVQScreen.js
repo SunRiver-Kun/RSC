@@ -31,7 +31,7 @@ if (_G.loadedFiles[filePath] == null) {
         return self;
     };
 
-    exports.onClass = function (self) {
+    exports.onClass = function (self, image) {
         var imageName = self.imageNameTex.getValue();
         if (imageName == "") { alert("遥感图像名不应为空"); }
         var numClusters = _G.Astr2PInt(self.numClustersTex.getValue(), "聚类数应为正整数");
@@ -43,7 +43,7 @@ if (_G.loadedFiles[filePath] == null) {
             return;
         }
 
-        var input = ee.Image(imageName);
+        var input = image != null ? image : ee.Image(imageName);
         print("input", input);
         var training = input.sample({
             region: self.region,

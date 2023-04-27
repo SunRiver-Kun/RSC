@@ -5,6 +5,7 @@ if (_G.loadedFiles[filePath] == null) {
     print("Load " + filePath);
 
     var MapDrawer = require("users/sunriverkun/gee_test:widgets/mapDrawer.js");
+    var ImageBrowerScreen = require("users/sunriverkun/gee_test:screens/imageBrowerScreen.js");
 
     exports.new = function (name) {
         var panel = ui.Panel();
@@ -12,7 +13,9 @@ if (_G.loadedFiles[filePath] == null) {
         var self = {
             c: exports,
             widget: panel,
-            name : name ? name : "Title"
+            name: name ? name : "Title",
+            imageName: "",
+            image: null
         };
         return self;
     };
@@ -25,9 +28,7 @@ if (_G.loadedFiles[filePath] == null) {
         //图像输入
         self.imageLabel = ui.Label("遥感图像名");
         self.imageNameTex = ui.Textbox("", "LANDSAT/LC08/C01/T1_SR/LC08_192024_20160624");
-        self.chooseButton = ui.Button("选择", function () {
-            print("TODO: 打开searchScreen");
-        });
+        self.chooseButton = ui.Button("选择", _G.handler(self, exports.onChooseButtonClick));
         panel.add(_G.horizontals([self.imageLabel, self.imageNameTex, self.chooseButton], true));
         //算法参数
         self.argsPanel = ui.Panel();
@@ -46,7 +47,7 @@ if (_G.loadedFiles[filePath] == null) {
         self.regionButton = ui.Button("绘制", _G.handler(self, exports.openMapDrawScreen));
         self.regionLabel = ui.Label("");
         exports.setRegion(self, null);
-        panel.add(_G.horizontals([ui.Label("绘制训练区域(可选)"),self.regionButton, self.regionLabel], true));
+        panel.add(_G.horizontals([ui.Label("绘制训练区域(可选)"), self.regionButton, self.regionLabel], true));
 
         //分类，取消
         self.classButton = ui.Button("分类", _G.handler(self, exports.onClass));
@@ -60,17 +61,48 @@ if (_G.loadedFiles[filePath] == null) {
         self.regionLabel.setValue(region == null ? "(全部)" : "(部分)");
     };
 
+    exports.getShowImage = function (self) {
+        var name = self.imageNameTex.getValue();
+        if (name == "") { return null; }
+
+        if (_G.isClipImageName(name)) {
+            if (self.imageName == name && self.image != null) {
+                Map.centerObject(self.image);
+                _G.rawAddLayerOrHideBefore(self.image, _G.getImageParams(name), name);
+                return self.image
+            } else {
+                alert("遥感图像名错误，裁剪后图像名被修改，或是直接使用了裁剪后图像名");
+                return null;
+            }
+        } else {
+            _G.addLayerOrHideBefore(name, true);
+            return ee.Image(name);
+        }
+    }
+
     exports.openMapDrawScreen = function (self) {
-        _G.addLayerOrHideBefore(self.imageNameTex.getValue(), true);
+        if (exports.getShowImage(self) == null) { return; }
         var mapDrawScreen = MapDrawer.new("请绘制训练区域", function (geoLayers) {
             var length = geoLayers.length();
             exports.setRegion(self, length > 0 ? geoLayers.get(length - 1).toGeometry() : null);
         }, null, true);
     };
 
+    exports.onChooseButtonClick = function (self) {
+        var screen = ImageBrowerScreen.new(function (image, imageName) {
+            self.image = image;
+            self.imageName = imageName;
+            self.imageNameTex.setValue(imageName);
+            _G.popScreen();
+        });
+        _G.pushScreen(screen);
+    }
+
     exports.onClass = function (self) {
-        _G.addLayerOrHideBefore(self.imageNameTex.getValue(), true);
-        if (self.onClass) { self.onClass(self); }
+        var image = exports.getShowImage(self);
+        if (image == null) { return; }
+
+        if (self.onClass) { self.onClass(self, image); }
     };
 
     exports.setOnClass = function (self, fn) {
