@@ -9,7 +9,8 @@ if (_G.loadedFiles[filePath] == null) {
     exports.des = { fontSize: "12px", color: "gray" };
 
     exports.imageParams = {
-        LANDSAT: { bands: ["B4", "B3", "B2"], min: 0, max: 3000 }
+        "LANDSAT/LC08/C01/T1_SR": { bands: ["B4", "B3", "B2"], min: 0, max: 3000 },
+        "LANDSAT/LC08/C01/T1": { bands: ["B4", "B3", "B2"], min: 0, max: 300 }
     };
 } else {
     exports = _G.loadedFiles[filePath];

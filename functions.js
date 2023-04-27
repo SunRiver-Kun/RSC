@@ -44,11 +44,11 @@ if (_G.loadedFiles[filePath] == null) {
         if (widgets === undefined) { return panel; }
         if (widgets.length === undefined) { print("[ERROR]: _G.horizontals的widgets不是数组", widgets); }
         for (var i = 0; i < widgets.length; ++i) {
-            if(widgets[i] == null || widgets[i].style==null) { 
-                print("[ERROR]: _G.horizontals()",widgets);
-                return panel; 
+            if (widgets[i] == null || widgets[i].style == null) {
+                print("[ERROR]: _G.horizontals()", widgets);
+                return panel;
             }
-            
+
             if (!NoHstretch) {
                 widgets[i].style().set("stretch", "horizontal");
             }
@@ -63,9 +63,9 @@ if (_G.loadedFiles[filePath] == null) {
         if (widgets === undefined) { return panel; }
         if (widgets.length === undefined) { print("[ERROR]: _G.horizontals的widgets不是数组", widgets); }
         for (var i = 0; i < widgets.length; ++i) {
-            if(widgets[i] == null || widgets[i].style==null) { 
-                print("[ERROR]: _G.verticals()",widgets);
-                return panel; 
+            if (widgets[i] == null || widgets[i].style == null) {
+                print("[ERROR]: _G.verticals()", widgets);
+                return panel;
             }
             if (!NoVstretch) {
                 widgets[i].style().set("stretch", "vertical");
@@ -114,18 +114,32 @@ if (_G.loadedFiles[filePath] == null) {
     };
 
     _G.clamp = function (value, min, max) {
-        if(value < min) { return min; }
-        if(value > max) { return max; }
+        if (value < min) { return min; }
+        if (value > max) { return max; }
         return value;
     };
 
     //地图
+    _G.getImageParams = function (imageName) {
+        var start = imageName.indexOf("+") + 1;
+        var end = imageName.lastIndexOf("/");
+        if (end == -1) { end = undefined; }
+
+        var type = imageName.substring(start, end);
+        var visParams = _G.imageParams[type];
+        if (!visParams) {
+            print("[Waring]: can't find imageParams for", imageName, type);
+            return {};
+        }
+        return visParams;
+    }
+
     _G.addLayer = function (imageName, focus) {
-        if (imageName == null || imageName == "") { print("[ERROR]: _G.addLayer null imageName"); return null; }
+        if (imageName == null || imageName == "" || imageName.startsWith("clip+")) { print("[ERROR]: _G.addLayer imageName of ", imageName); return null; }
         for (var type in _G.imageParams) {
             if (imageName.indexOf(type) != -1) {
                 var image = ee.Image(imageName);
-                var layer = Map.addLayer(image, _G.imageParams[type], imageName);
+                var layer = Map.addLayer(image, _G.getImageParams(imageName), imageName);
                 if (focus) { Map.centerObject(image); }
                 return layer;
             }
@@ -135,7 +149,7 @@ if (_G.loadedFiles[filePath] == null) {
     };
 
     _G.addLayerOrHideBefore = function (imageName, focus) {
-        if (imageName == null || imageName == "") { print("[ERROR]: _G.addLayerOrHideBefore null imageName"); return null; }
+        if (imageName == null || imageName == "" || imageName.startsWith("clip+")) { print("[ERROR]: _G.addLayerOrHideBefore imageName of ", imageName); return null; }
 
         var layers = Map.layers();
         var index = null;
@@ -157,10 +171,10 @@ if (_G.loadedFiles[filePath] == null) {
 
     _G.rawAddLayerOrReplaceTop = function (eeObject, visParams, name, shown, opacity) {
         var layers = Map.layers();
-        if(layers.length() > 0 && name!=null && name!=""){
-            var elm = layers.get(layers.length()-1);
-            if(elm.getName() == name) { layers.remove(elm); }
-        } 
+        if (layers.length() > 0 && name != null && name != "") {
+            var elm = layers.get(layers.length() - 1);
+            if (elm.getName() == name) { layers.remove(elm); }
+        }
         return Map.addLayer(eeObject, visParams, name, shown, opacity);
     }
 
