@@ -120,6 +120,10 @@ if (_G.loadedFiles[filePath] == null) {
     };
 
     //地图
+    _G.isClipImageName = function (imageName) {
+        return imageName.startsWith(_G.clipImageHead);
+    }
+
     _G.getImageParams = function (imageName) {
         var start = imageName.indexOf("+") + 1;
         var end = imageName.lastIndexOf("/");
@@ -135,7 +139,7 @@ if (_G.loadedFiles[filePath] == null) {
     }
 
     _G.addLayer = function (imageName, focus) {
-        if (imageName == null || imageName == "" || imageName.startsWith("clip+")) { print("[ERROR]: _G.addLayer imageName of ", imageName); return null; }
+        if (imageName == null || imageName == "" || _G.isClipImageName(imageName)) { print("[ERROR]: _G.addLayer imageName of ", imageName); return null; }
         for (var type in _G.imageParams) {
             if (imageName.indexOf(type) != -1) {
                 var image = ee.Image(imageName);
@@ -149,7 +153,7 @@ if (_G.loadedFiles[filePath] == null) {
     };
 
     _G.addLayerOrHideBefore = function (imageName, focus) {
-        if (imageName == null || imageName == "" || imageName.startsWith("clip+")) { print("[ERROR]: _G.addLayerOrHideBefore imageName of ", imageName); return null; }
+        if (imageName == null || imageName == "" || _G.isClipImageName(imageName)) { print("[ERROR]: _G.addLayerOrHideBefore imageName of ", imageName); return null; }
 
         var layers = Map.layers();
         var index = null;
@@ -168,6 +172,28 @@ if (_G.loadedFiles[filePath] == null) {
             return _G.addLayer(imageName, focus);
         }
     };
+
+    _G.rawAddLayerOrHideBefore = function (eeObject, visParams, name, shown, opacity) {
+        var layers = Map.layers();
+        if (layers.length() > 0 && name != null && name != "") {
+            var index = null;
+            for (var i = 0; i < layers.length(); ++i) {
+                if (layers.get(i).getName() == name) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index != null) {
+                var layer = layers.get(index);
+                if(layer.getEeObject() == eeObject){
+                    for (var i = index + 1; i < layers.length(); ++i) { layers.get(i).setShown(false); }
+                    layer.setShown(true);
+                    return layer;
+                } 
+            } 
+        }
+        return Map.addLayer(eeObject, visParams, name, shown, opacity);
+    }
 
     _G.rawAddLayerOrReplaceTop = function (eeObject, visParams, name, shown, opacity) {
         var layers = Map.layers();

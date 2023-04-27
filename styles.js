@@ -10,7 +10,7 @@ if (_G.loadedFiles[filePath] == null) {
 
     exports.imageParams = {
         "LANDSAT/LC08/C01/T1_SR": { bands: ["B4", "B3", "B2"], min: 0, max: 3000 },
-        "LANDSAT/LC08/C01/T1": { bands: ["B4", "B3", "B2"], min: 0, max: 300 }
+        "LANDSAT/LC08/C01/T1": { bands: ["B4", "B3", "B2"], min: 5000, max: 15000 }
     };
 } else {
     exports = _G.loadedFiles[filePath];

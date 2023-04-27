@@ -15,12 +15,14 @@ if (_G.loadedFiles[filePath] == null) {
             clipGeo: clipGeo,
             collectionLength: null,
             selectedIndex: null,
-            image: null
+            image: null,
+            imageId: "",
+            readyToChoose: false
         };
         self.prevButton = ui.Button("上一张", _G.handler(self, exports.onPrevButtonClick), true);
         self.nextButton = ui.Button("下一张", _G.handler(self, exports.onNextButtonClick), true);
-        self.chooseButton = ui.Button("选择");
-        self.downloadButton = ui.Button("下载");
+        self.chooseButton = ui.Button("选择", _G.handler(self, exports.onChooseButtonClick));
+        self.downloadButton = ui.Button("下载", _G.handler(self, exports.onDownloadButtonClick));
 
 
         self.clipCheck = ui.Checkbox("裁剪", clipGeo != null, _G.handler(self, exports.onClipCheckChange), undefined, { shown: clipGeo != null });
@@ -56,11 +58,15 @@ if (_G.loadedFiles[filePath] == null) {
     };
 
     exports.setImageByIndex = function (self, index) {
+        self.readyToChoose = false;
+
         if (self.collectionLength == null) { print("imageCollectionViewr: isLoading"); return; }
+
+        self.idLabel.setValue("ID: ");
+        self.dateLabel.setValue("Data: ");
+
         if (self.collectionLength == 0) {
             _G.hide(self.thumbnail);
-            self.idLabel.setValue("ID: ");
-            self.dateLabel.setValue("Data: ");
             self.orderLabel.setValue("Index: 0/0");
             self.prevButton.setDisabled(true);
             self.nextButton.setDisabled(true);
@@ -81,6 +87,7 @@ if (_G.loadedFiles[filePath] == null) {
         image.get("system:id").evaluate(function (id) {
             self.imageId = id;
             self.idLabel.setValue("ID: " + id);
+            self.readyToChoose = true;
         });
         image.date().format("YYYY-MM-dd").evaluate(function (date) {
             self.dateLabel.setValue("Date: " + date);
@@ -113,14 +120,20 @@ if (_G.loadedFiles[filePath] == null) {
     };
 
     exports.onChooseButtonClick = function (self) {
-        if (self.onChooseClick) {
-            self.onChooseClick(exports.getImage(self), self.imageId, self);
+        if (self.readyToChoose && self.onChooseClick) {
+            var image = exports.getImage(self);
+            var name = image == self.image ? self.imageId : _G.clipImageHead + self.imageId;
+            self.onChooseClick(image, name, self);
+        } else {
+            print("[Waring]: image is not ready to choose");
         }
     };
 
     exports.onDownloadButtonClick = function (self) {
-        if (self.onDownloadClick) {
+        if (self.readyToChoose && self.onDownloadClick) {
             self.onDownloadClick(self);
+        } else {
+            print("[Waring]: image is not ready to download");
         }
     };
 

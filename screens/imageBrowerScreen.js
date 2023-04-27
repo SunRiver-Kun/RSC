@@ -19,15 +19,13 @@ if (_G.loadedFiles[filePath] == null) {
     var divCh = "；";
 
     var defaultCollectionTypes = {
-        "Landsat-8-T1_SR": { c: "LANDSAT/LC08/C01/T1_SR", des: "Landsat 8, Collection 1, Tier 1 + Real Time", visParams: _G.imageParams.LANDSAT },
-        "Landsat-8-T1": { c: "LANDSAT/LC08/C01/T1", des: "Landsat 8, Collection 1, Tier 1", visParams: _G.imageParams.LANDSAT }
+        "Landsat-8-T1_SR": { c: "LANDSAT/LC08/C01/T1_SR", des: "Landsat 8, Collection 1, Tier 1 + Real Time" },
+        "Landsat-8-T1": { c: "LANDSAT/LC08/C01/T1", des: "Landsat 8, Collection 1, Tier 1" }
     };
     var defaultCollectionType = "Landsat-8-T1_SR";
 
     exports.new = function (onChooseClick, collectionTypes, defaultType) {
-        var panel = ui.Panel(null, ui.Panel.Layout.flow("vertical"), {
-            height: "80%"
-        });
+        var panel = ui.Panel(null, ui.Panel.Layout.flow("vertical"));
         var self = {
             c: exports,
             widget: panel,
@@ -108,7 +106,7 @@ if (_G.loadedFiles[filePath] == null) {
         var mapDrawScreen = MapDrawer.new("请绘制自定义区域（点/线/多边形/矩形）", function (geoLayers) {
             var length = geoLayers.length();
             self.customArea = length > 0 ? geoLayers.get(length - 1).toGeometry() : null;
-        });
+        }, null, true);
     };
 
 
@@ -141,11 +139,8 @@ if (_G.loadedFiles[filePath] == null) {
 
         geometry = union(geometry, _getGeometry(provincesData, "省区", provinceStr));
         geometry = union(geometry, _getGeometry(citysData, "地市", cityStr));
+        geometry = union(geometry, self.customArea);
 
-        var layers = Map.drawingTools().layers();
-        for (var i = 0; i < layers.length(); ++i) {
-            geometry = union(geometry, layers.get(i).toGeometry());
-        }
         return geometry;
     }
 
@@ -212,7 +207,8 @@ if (_G.loadedFiles[filePath] == null) {
             .filter(ee.Filter.lte('CLOUD_COVER', cloudValue));
         if (geometry != null) { collection = collection.filterBounds(geometry); }
 
-        var viewr = ImageCollectionViewr.new(collection, typeData.visParams, typeData.visParams, geometry, self.onChooseClick);
+        var visParams = _G.imageParams[typeData.c];
+        var viewr = ImageCollectionViewr.new(collection, visParams, visParams, geometry, self.onChooseClick);
         self.resultPanel.clear();
         self.resultPanel.add(viewr.widget);
     };
