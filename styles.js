@@ -8,7 +8,9 @@ if (_G.loadedFiles[filePath] == null) {
     exports.title = { fontWeight: "bold" };
     exports.des = { fontSize: "12px", color: "gray" };
 
-
+    exports.imageParams = {
+        LANDSAT: { bands: ["B4", "B3", "B2"], min: 0, max: 3000 }
+    };
 } else {
     exports = _G.loadedFiles[filePath];
 }

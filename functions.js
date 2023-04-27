@@ -44,6 +44,11 @@ if (_G.loadedFiles[filePath] == null) {
         if (widgets === undefined) { return panel; }
         if (widgets.length === undefined) { print("[ERROR]: _G.horizontals的widgets不是数组", widgets); }
         for (var i = 0; i < widgets.length; ++i) {
+            if(widgets[i] == null || widgets[i].style==null) { 
+                print("[ERROR]: _G.horizontals()",widgets);
+                return panel; 
+            }
+            
             if (!NoHstretch) {
                 widgets[i].style().set("stretch", "horizontal");
             }
@@ -58,6 +63,10 @@ if (_G.loadedFiles[filePath] == null) {
         if (widgets === undefined) { return panel; }
         if (widgets.length === undefined) { print("[ERROR]: _G.horizontals的widgets不是数组", widgets); }
         for (var i = 0; i < widgets.length; ++i) {
+            if(widgets[i] == null || widgets[i].style==null) { 
+                print("[ERROR]: _G.verticals()",widgets);
+                return panel; 
+            }
             if (!NoVstretch) {
                 widgets[i].style().set("stretch", "vertical");
             }
@@ -104,16 +113,19 @@ if (_G.loadedFiles[filePath] == null) {
         return number;
     };
 
-    //地图
-    var imageParams = {
-        LANDSAT: { bands: ["B4", "B3", "B2"], min: 0, max: 3000 }
+    _G.clamp = function (value, min, max) {
+        if(value < min) { return min; }
+        if(value > max) { return max; }
+        return value;
     };
+
+    //地图
     _G.addLayer = function (imageName, focus) {
         if (imageName == null || imageName == "") { print("[ERROR]: _G.addLayer null imageName"); return null; }
-        for (var type in imageParams) {
+        for (var type in _G.imageParams) {
             if (imageName.indexOf(type) != -1) {
                 var image = ee.Image(imageName);
-                var layer = Map.addLayer(image, imageParams[type], imageName);
+                var layer = Map.addLayer(image, _G.imageParams[type], imageName);
                 if (focus) { Map.centerObject(image); }
                 return layer;
             }
