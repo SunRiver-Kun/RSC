@@ -21,7 +21,7 @@ if (_G.loadedFiles[filePath] == null) {
         self.nextButton = ui.Button("下一张", _G.handler(self, exports.onNextButtonClick), true);
         self.chooseButton = ui.Button("选择");
         self.downloadButton = ui.Button("下载");
-        
+
 
         self.clipCheck = ui.Checkbox("裁剪", clipGeo != null, _G.handler(self, exports.onClipCheckChange), undefined, { shown: clipGeo != null });
         self.thumbnail = ui.Thumbnail({ params: thumbnailParams, onClick: _G.handler(self, exports.onThumbnailClick) });
@@ -51,7 +51,7 @@ if (_G.loadedFiles[filePath] == null) {
     };
 
     exports.getImage = function (self) {
-        if(self.image == null) { return null; }
+        if (self.image == null) { return null; }
         return self.clipGeo && self.clipCheck.getValue() ? self.image.clip(self.clipGeo) : self.image;
     };
 
@@ -79,6 +79,7 @@ if (_G.loadedFiles[filePath] == null) {
         // Asynchronously update the image information.
         self.orderLabel.setValue("Index: " + (index + 1) + "/" + self.collectionLength);
         image.get("system:id").evaluate(function (id) {
+            self.imageId = id;
             self.idLabel.setValue("ID: " + id);
         });
         image.date().format("YYYY-MM-dd").evaluate(function (date) {
@@ -88,12 +89,12 @@ if (_G.loadedFiles[filePath] == null) {
 
     exports.setOnChooseClick = function (self, fn) {
         self.onChooseClick = fn;
-        self.chooseButton.style().set("shown", fn!=null);
+        self.chooseButton.style().set("shown", fn != null);
     };
 
     exports.setOnDownloadClick = function (self, fn) {
         self.onDownloadClick = fn;
-        self.downloadButton.style().set("shown", fn!=null);
+        self.downloadButton.style().set("shown", fn != null);
     };
 
     exports.onClipCheckChange = function (self) {
@@ -112,8 +113,8 @@ if (_G.loadedFiles[filePath] == null) {
     };
 
     exports.onChooseButtonClick = function (self) {
-        if(self.onChooseClick){
-            self.onChooseClick(self);
+        if (self.onChooseClick) {
+            self.onChooseClick(exports.getImage(self), self.imageId, self);
         }
     };
 
