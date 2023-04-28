@@ -4,9 +4,12 @@ if (_G.loadedFiles[filePath] == null) {
     _G.loadedFiles[filePath] = exports;
     print("Load " + filePath);
 
-    exports.new = function (helpStr, onFinishCb, onCancelCb, resetLayer) {
+    exports.new = function (helpStr, onFinishCb, onCancelCb, resetLayer, drawShape) {
+        drawShape = drawShape ? drawShape : "rectangle";
+
         var panel = ui.Panel(null, ui.Panel.Layout.flow("vertical"), {
             position: "top-left",
+            border : "4px solid gray"
         });
         var self = {
             c: exports,
@@ -36,6 +39,7 @@ if (_G.loadedFiles[filePath] == null) {
         panel.add(_G.horizontals([self.finishButton, self.cancelButton]));
 
         Map.add(self.widget);
+        Map.drawingTools().setShape(drawShape); 
 
         return self;
     };

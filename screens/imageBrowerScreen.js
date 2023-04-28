@@ -103,7 +103,7 @@ if (_G.loadedFiles[filePath] == null) {
 
     //地区
     exports.onCustomAreaButotnClick = function (self) {
-        var mapDrawScreen = MapDrawer.new("请绘制自定义区域（点/线/多边形/矩形）", function (geoLayers) {
+        var mapDrawScreen = MapDrawer.new("请绘制自定义区域", function (geoLayers) {
             var length = geoLayers.length();
             self.customArea = length > 0 ? geoLayers.get(length - 1).toGeometry() : null;
         }, null, true);

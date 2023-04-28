@@ -129,7 +129,7 @@ if (_G.loadedFiles[filePath] == null) {
             self.classifyVisParams.palette = palette;
 
             exports.setPoints(self, length > 0 ? Map.drawingTools().toFeatureCollection(classProperty) : null);
-        }, null, true);
+        }, null, true, "point");
     };
 
     exports.onChooseButtonClick = function (self) {
