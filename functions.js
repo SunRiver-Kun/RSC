@@ -160,13 +160,13 @@ if (_G.loadedFiles[filePath] == null) {
         return bands;
     };
 
-    _G.addLayer = function (imageName, focus) {
+    _G.addLayer = function (imageName, focus, zoom) {
         if (imageName == null || imageName == "" || _G.isClipImageName(imageName)) { print("[ERROR]: _G.addLayer imageName of ", imageName); return null; }
         for (var type in _G.imageParams) {
             if (imageName.indexOf(type) != -1) {
                 var image = ee.Image(imageName);
                 var layer = Map.addLayer(image, _G.getImageVisualParams(imageName), imageName);
-                if (focus) { Map.centerObject(image); }
+                if (focus) { Map.centerObject(image, zoom); }
                 return layer;
             }
         }
@@ -174,7 +174,7 @@ if (_G.loadedFiles[filePath] == null) {
         return null;
     };
 
-    _G.addLayerOrHideBefore = function (imageName, focus) {
+    _G.addLayerOrHideBefore = function (imageName, focus, zoom) {
         if (imageName == null || imageName == "" || _G.isClipImageName(imageName)) { print("[ERROR]: _G.addLayerOrHideBefore imageName of ", imageName); return null; }
 
         var layers = Map.layers();
@@ -188,10 +188,10 @@ if (_G.loadedFiles[filePath] == null) {
         if (index != null) {
             for (var i = index + 1; i < layers.length(); ++i) { layers.get(i).setShown(false); }
             layers.get(index).setShown(true);
-            if (focus) { Map.centerObject(layers.get(index).getEeObject()); }
+            if (focus) { Map.centerObject(layers.get(index).getEeObject(), zoom); }
             return layers.get(index);
         } else {
-            return _G.addLayer(imageName, focus);
+            return _G.addLayer(imageName, focus, zoom);
         }
     };
 

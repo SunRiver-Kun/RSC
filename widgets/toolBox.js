@@ -1,6 +1,9 @@
 var _G = Number.prototype._G;
 //监督分类
 var CartScreen = require("users/sunriverkun/gee_test:screens/cartScreen.js");
+var MinimumDistanceScreen = require("users/sunriverkun/gee_test:screens/minimumDistanceScreen.js");
+var NaiveBayesScreen = require("users/sunriverkun/gee_test:screens/naiveBayesScreen.js");
+var RandomForestScreen = require("users/sunriverkun/gee_test:screens/randomForestScreen.js");
 
 //非监督分类
 var KMeansScreen = require("users/sunriverkun/gee_test:screens/kMeansScreen.js");
@@ -46,6 +49,9 @@ exports.new = function () {
     var classifyMenu = SubMenu.new("📁监督分类", undefined ,subPanelStyle);
     panel.add(classifyMenu.widget);
     addMenuItem(MenuItem.new("Cart", CartScreen), classifyMenu);
+    addMenuItem(MenuItem.new("MinDistance", MinimumDistanceScreen), classifyMenu);
+    addMenuItem(MenuItem.new("NaiveBayes", NaiveBayesScreen), classifyMenu);
+    addMenuItem(MenuItem.new("RandomForest", RandomForestScreen), classifyMenu);
 
     var clusterMenu = SubMenu.new("📁非监督分类", undefined, subPanelStyle);
     panel.add(clusterMenu.widget);

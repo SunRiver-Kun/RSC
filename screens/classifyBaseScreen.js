@@ -101,9 +101,10 @@ if (_G.loadedFiles[filePath] == null) {
         var name = self.imageNameTex.getValue();
         if (name == "") { return null; }
 
+        var zoom = 10;
         if (_G.isClipImageName(name)) {
             if (self.imageName == name && self.image != null) {
-                Map.centerObject(self.image);
+                Map.centerObject(self.image, zoom);
                 _G.rawAddLayerOrHideBefore(self.image, _G.getImageVisualParams(name), name);
                 return self.image
             } else {
@@ -111,7 +112,7 @@ if (_G.loadedFiles[filePath] == null) {
                 return null;
             }
         } else {
-            _G.addLayerOrHideBefore(name, true);
+            _G.addLayerOrHideBefore(name, true, zoom);
             return ee.Image(name);
         }
     }
@@ -140,7 +141,7 @@ if (_G.loadedFiles[filePath] == null) {
         _G.pushScreen(screen);
     }
 
-    //vitural
+    //abstract
     exports.getClassifier = function (self) {
         return null;
     }
