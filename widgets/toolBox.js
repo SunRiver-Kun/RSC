@@ -1,6 +1,6 @@
 var _G = Number.prototype._G;
 //监督分类
-
+var CartScreen = require("users/sunriverkun/gee_test:screens/cartScreen.js");
 
 //非监督分类
 var KMeansScreen = require("users/sunriverkun/gee_test:screens/kMeansScreen.js");
@@ -45,7 +45,7 @@ exports.new = function () {
     var subPanelStyle = { margin: "0px 0px auto 10%" };
     var classifyMenu = SubMenu.new("📁监督分类", undefined ,subPanelStyle);
     panel.add(classifyMenu.widget);
-    addMenuItem(MenuItem.new("decisionTree", null), classifyMenu);
+    addMenuItem(MenuItem.new("Cart", CartScreen), classifyMenu);
 
     var clusterMenu = SubMenu.new("📁非监督分类", undefined, subPanelStyle);
     panel.add(clusterMenu.widget);
