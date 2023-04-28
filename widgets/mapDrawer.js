@@ -5,8 +5,9 @@ if (_G.loadedFiles[filePath] == null) {
     print("Load " + filePath);
 
     exports.new = function (helpStr, onFinishCb, onCancelCb, resetLayer) {
-        var panel = ui.Panel();
-        panel.setLayout(ui.Panel.Layout.flow("horizontal"));
+        var panel = ui.Panel(null, ui.Panel.Layout.flow("vertical"), {
+            position: "top-left",
+        });
         var self = {
             c: exports,
             widget: panel
@@ -15,14 +16,24 @@ if (_G.loadedFiles[filePath] == null) {
         exports.setOnFinish(self, onFinishCb);
         exports.setOnCancel(self, onCancelCb);
         self.resetLayer = resetLayer;
-        if(self.resetLayer) { Map.drawingTools().layers().reset(); }
+        if (self.resetLayer) { Map.drawingTools().layers().reset(); }
 
-        self.helpLabel = ui.Label(helpStr!=undefined ? helpStr : "请使用左上角的绘图工具绘制几何体");
-        panel.add(self.helpLabel);
+        self.helpLabel = ui.Label("请使用左上角的绘图工具绘制几何体", { margin: "auto" });
+        self.helpDesLabel = ui.Label("", { margin: "auto", fontSize: "12px", color: "gray" });
+        if ((typeof helpStr) == "string") {
+            self.helpLabel.setValue(helpStr);
+            _G.hide(self.helpDesLabel);
+        } else {
+            self.helpLabel.setValue(helpStr.title);
+            self.helpDesLabel.setValue(helpStr.des);
+        }
+
         self.finishButton = ui.Button("完成", _G.handler(self, exports.onFinish));
-        panel.add(self.finishButton);
         self.cancelButton = ui.Button("取消", _G.handler(self, exports.onCancel));
-        panel.add(self.cancelButton);
+
+        panel.add(self.helpLabel);
+        panel.add(self.helpDesLabel);
+        panel.add(_G.horizontals([self.finishButton, self.cancelButton]));
 
         Map.add(self.widget);
 
@@ -30,15 +41,15 @@ if (_G.loadedFiles[filePath] == null) {
     };
 
     exports.setOnFinish = function (self, fn) {
-       self.onFinishCb = fn; 
+        self.onFinishCb = fn;
     }
 
     exports.setOnCancel = function (self, fn) {
-        self.onCancelCb = fn; 
-     }
+        self.onCancelCb = fn;
+    }
 
     exports.pop = function (self) {
-        if(self.resetLayer) { Map.drawingTools().layers().reset(); }
+        if (self.resetLayer) { Map.drawingTools().layers().reset(); }
         Map.remove(self.widget);
     }
 
