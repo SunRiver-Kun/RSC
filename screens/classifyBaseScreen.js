@@ -140,15 +140,40 @@ if (_G.loadedFiles[filePath] == null) {
         _G.pushScreen(screen);
     }
 
+    //vitural
+    exports.getClassifier = function (self) {
+        return null;
+    }
+
     exports.onClass = function (self) {
         var image = exports.getShowImage(self);
         if (image == null) { return; }
 
-        if (self.onClass) { self.onClass(self, image); }
-    };
+        var imageName = self.imageNameTex.getValue();
+        if (imageName == "") { alert("遥感图像名不应为空"); return; }
+        var points = exports.getPoints(self);  //FeatureCollection
+        if (points == null) { alert("未绘制样板点"); return; }
 
-    exports.setOnClass = function (self, fn) {
-        self.onClass = fn;
+        var classifier = self.c.getClassifier(self);
+        if(classifier == null) { return; }
+
+        var classProperty = exports.getClassProperty();
+        var bands = exports.getBands(self);
+        var training = image.select(bands).sampleRegions({
+            collection: points,
+            properties: [classProperty],
+            scale: 30
+        });
+        print("training", training);
+        var classifier = classifier.train({
+            features: training,
+            classProperty: classProperty,
+            inputProperties: bands
+        });
+        var classified = image.select(bands).classify(classifier);
+        print("classified", classified);
+        Map.centerObject(classified);
+        Map.addLayer(classified, exports.getClassifyVisParams(self), self.title);
     };
 
     exports.setArgsWidget = function (self, argsWidget) {

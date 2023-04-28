@@ -20,48 +20,21 @@ if (_G.loadedFiles[filePath] == null) {
         self.maxNodesTex = ui.Textbox("留空不限制", "");
         panel.add(_G.horizontals([self.maxNodesLabel, self.maxNodesTex]));
 
-        ClassifyBaseScreen.setOnClass(self, exports.onClass);
         ClassifyBaseScreen.setArgsWidget(self, panel);
         ClassifyBaseScreen.init(self);
 
         return self;
     };
 
-    exports.onClass = function (self, input) {
-        var imageName = self.imageNameTex.getValue();
-        if (imageName == "") { alert("遥感图像名不应为空"); return; }
-
-        var points = ClassifyBaseScreen.getPoints(self);  //FeatureCollection
-        if (points == null) { alert("未绘制样板点"); return; }
-
+    exports.getClassifier = function (self) {
         var maxNodes = self.maxNodesTex.getValue() == "" ? undefined : _G.Astr2UInt(self.maxNodesTex.getValue(), "最大节点数应留空或为正整数");
         if (maxNodes == null) { maxNodes = undefined; }
 
         var minLeafPopulation = _G.Astr2UInt(self.minLeafPopulationTex.getValue(), "最小节点数应为正整数");
-        if (minLeafPopulation == null) { return; }
+        if (minLeafPopulation == null) { return null; }
 
-        var image = input != null ? input : ee.Image(imageName);
-        var classProperty = ClassifyBaseScreen.getClassProperty();
-        var bands = ClassifyBaseScreen.getBands(self);
-
-        var training = image.select(bands).sampleRegions({
-            collection: points,
-            properties: [classProperty],
-            scale: 30
-        });
-        print('training', training);
-        var classifier = ee.Classifier.smileCart(maxNodes, minLeafPopulation).train({
-            features: training,
-            classProperty: classProperty,
-            inputProperties: bands
-        });
-        var classified = image.select(bands).classify(classifier);
-        print("classified", classified);
-        //Display classification
-        Map.centerObject(classified);
-        Map.addLayer(classified, ClassifyBaseScreen.getClassifyVisParams(self), 'Cart');
-    };
-
+        return ee.Classifier.smileCart(maxNodes, minLeafPopulation);
+    }
 } else {
     exports = _G.loadedFiles[filePath];
 }
