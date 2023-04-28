@@ -68,7 +68,7 @@ if (_G.loadedFiles[filePath] == null) {
         if (_G.isClipImageName(name)) {
             if (self.imageName == name && self.image != null) {
                 Map.centerObject(self.image);
-                _G.rawAddLayerOrHideBefore(self.image, _G.getImageParams(name), name);
+                _G.rawAddLayerOrHideBefore(self.image, _G.getImageVisualParams(name), name);
                 return self.image
             } else {
                 alert("遥感图像名错误，裁剪后图像名被修改，或是直接使用了裁剪后图像名");

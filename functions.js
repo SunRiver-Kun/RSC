@@ -122,28 +122,50 @@ if (_G.loadedFiles[filePath] == null) {
     //地图
     _G.isClipImageName = function (imageName) {
         return imageName.startsWith(_G.clipImageHead);
-    }
+    };
 
-    _G.getImageParams = function (imageName) {
-        var start = imageName.indexOf("+") + 1;
-        var end = imageName.lastIndexOf("/");
-        if (end == -1) { end = undefined; }
+    _G.getImageParams = function (imageName, isRaw) {
+        var type = null;
+        if (isRaw) {
+            type = imageName;
+        } else {
+            var start = imageName.indexOf("+") + 1;
+            var end = imageName.lastIndexOf("/");
+            if (end == -1) { end = undefined; }
+            type = imageName.substring(start, end);
+        }
+        var params = _G.imageParams[type];
+        if (!params) {
+            print("[Waring]:_G.getImageParams can't find imageParams for", imageName, type);
+            return {};
+        }
+        return params;
+    };
 
-        var type = imageName.substring(start, end);
-        var visParams = _G.imageParams[type];
+    _G.getImageVisualParams = function (imageName, isRaw) {
+        var visParams = _G.getImageParams(imageName, isRaw).visParams;
         if (!visParams) {
-            print("[Waring]: can't find imageParams for", imageName, type);
+            print("[Waring]:_G.getImageVisualParams can't find visParams for", imageName, type);
             return {};
         }
         return visParams;
-    }
+    };
+
+    _G.getImageBands = function (imageName, isRaw) {
+        var bands = _G.getImageParams(imageName, isRaw).bands;
+        if (!bands) {
+            print("[Waring]:_G.getImageBands can't find bands for", imageName, type);
+            return {};
+        }
+        return bands;
+    };
 
     _G.addLayer = function (imageName, focus) {
         if (imageName == null || imageName == "" || _G.isClipImageName(imageName)) { print("[ERROR]: _G.addLayer imageName of ", imageName); return null; }
         for (var type in _G.imageParams) {
             if (imageName.indexOf(type) != -1) {
                 var image = ee.Image(imageName);
-                var layer = Map.addLayer(image, _G.getImageParams(imageName), imageName);
+                var layer = Map.addLayer(image, _G.getImageVisualParams(imageName), imageName);
                 if (focus) { Map.centerObject(image); }
                 return layer;
             }
@@ -185,12 +207,12 @@ if (_G.loadedFiles[filePath] == null) {
             }
             if (index != null) {
                 var layer = layers.get(index);
-                if(layer.getEeObject() == eeObject){
+                if (layer.getEeObject() == eeObject) {
                     for (var i = index + 1; i < layers.length(); ++i) { layers.get(i).setShown(false); }
                     layer.setShown(true);
                     return layer;
-                } 
-            } 
+                }
+            }
         }
         return Map.addLayer(eeObject, visParams, name, shown, opacity);
     }

@@ -81,7 +81,7 @@ if (_G.loadedFiles[filePath] == null) {
         SubMenu.add(menu, _G.horizontals([ui.Label("云量占比小于等于"), self.cloudTex], true));
 
         //图像选择
-        self.searchButton = ui.Button("搜索", _G.handler(self, exports.onSearchButtonClick), false, { stretch: "horizontal" });
+        self.searchButton = ui.Button("搜索图像🔍", _G.handler(self, exports.onSearchButtonClick), false, { stretch: "horizontal" });
         self.resultLabel = ui.Label("");
         self.resultPanel = ui.Panel(null, ui.Panel.Layout.flow("vertical"));
 
@@ -207,7 +207,7 @@ if (_G.loadedFiles[filePath] == null) {
             .filter(ee.Filter.lte('CLOUD_COVER', cloudValue));
         if (geometry != null) { collection = collection.filterBounds(geometry); }
 
-        var visParams = _G.imageParams[typeData.c];
+        var visParams = _G.getImageVisualParams(typeData.c, true);
         var viewr = ImageCollectionViewr.new(collection, visParams, visParams, geometry, self.onChooseClick);
         self.resultPanel.clear();
         self.resultPanel.add(viewr.widget);
