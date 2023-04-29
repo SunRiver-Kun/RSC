@@ -25,7 +25,8 @@ if (_G.loadedFiles[filePath] == null) {
 
         //地区
         self.customArea = null;
-        self.customAreaButotn = ui.Button("绘制区域", _G.handler(self, exports.onCustomAreaButotnClick));
+        self.customAreaButotn = ui.Button("绘制", _G.handler(self, exports.onCustomAreaButotnClick));
+        self.customAreaClearButton = ui.Button("清除", function () { exports.setCustomArea(self, null); });
         self.areaPreviewButton = ui.Button("总体预览🔍", _G.handler(self, exports.onAreaPreviewButtonClick));
         self.provinceTex = ui.Textbox("以；分割不同省", "");
         self.provinceButton = ui.Button("补全", _G.handler(self, exports.onProvinceButtonClick));
@@ -33,9 +34,11 @@ if (_G.loadedFiles[filePath] == null) {
         self.cityButton = ui.Button("补全", _G.handler(self, exports.onCityButtonClick));
 
         panel.add(ui.Label("选择自定义/省/市一种或多种做为导出区域", _G.styles.des));
-        panel.add(_G.horizontals([ui.Label("自定义"), self.customAreaButotn, self.areaPreviewButton], true));
+        panel.add(_G.horizontals([ui.Label("自定义"), self.customAreaButotn, self.customAreaClearButton, self.areaPreviewButton], true));
         panel.add(_G.horizontals([ui.Label("+ 省"), self.provinceTex, self.provinceButton], true));
         panel.add(_G.horizontals([ui.Label("+ 市"), self.cityTex, self.cityButton], true));
+
+        exports.setCustomArea(self, null);
 
         return self;
     };
@@ -98,6 +101,11 @@ if (_G.loadedFiles[filePath] == null) {
         return geometry;
     }
 
+    exports.setCustomArea = function (self, area) {
+        self.customArea = area;
+        self.customAreaClearButton.style().set("shown", area != null);
+    }
+
     exports.onCustomAreaButotnClick = function (self) {
         var mapDrawScreen = MapDrawer.new("请绘制自定义区域", function (geoLayers) {
             var length = geoLayers.length();
@@ -105,7 +113,7 @@ if (_G.loadedFiles[filePath] == null) {
             for (var i = 0; i < length; ++i) {
                 area = union(area, geoLayers.get(length - 1).toGeometry());
             }
-            self.customArea = area;
+            exports.setCustomArea(self, area);
         }, null, true);
     };
 
