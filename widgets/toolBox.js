@@ -10,6 +10,9 @@ var KMeansScreen = require("users/sunriverkun/gee_test:screens/kMeansScreen.js")
 var XMeansScreen = require("users/sunriverkun/gee_test:screens/xMeansScreen.js");
 var LVQScreen = require("users/sunriverkun/gee_test:screens/lVQScreen.js");
 
+//数据管理
+var FeatureExportScreen = require("users/sunriverkun/gee_test:screens/featureExportScreen.js");
+
 //Widget
 var SubMenu = require("users/sunriverkun/gee_test:widgets/subMenu.js");
 
@@ -58,6 +61,11 @@ exports.new = function () {
     addMenuItem(MenuItem.new("kMeans", KMeansScreen), clusterMenu);
     addMenuItem(MenuItem.new("XMeans", XMeansScreen), clusterMenu);
     addMenuItem(MenuItem.new("LVQ", LVQScreen), clusterMenu);
+
+    var fileMenu = SubMenu.new("📁数据管理", undefined, subPanelStyle);
+    panel.add(fileMenu.widget);
+    addMenuItem(MenuItem.new("几何导出", FeatureExportScreen), fileMenu);
+
 
     return self;
 };
