@@ -11,12 +11,22 @@ if (_G.loadedFiles[filePath] == null) {
     //bands不包含sr_aerosol等
     exports.imageParams = {
         "LANDSAT/LC08/C01/T1_SR": {
+            des: "Landsat 8, Collection 1, Tier 1 + Real Time",
             visParams: { bands: ["B4", "B3", "B2"], min: 0, max: 3000 },
-            bands: ["B1", "B2", "B3", "B4", "B5", "B6", "B7", "B10", "B11"]
+            bands: ["B1", "B2", "B3", "B4", "B5", "B6", "B7", "B10", "B11"],
+            sortType: {
+                time: "system:time_start",
+                cloud: "CLOUD_COVER"
+            }
         },
         "LANDSAT/LC08/C01/T1": {
+            des: "Landsat 8, Collection 1, Tier 1",
             visParams: { bands: ["B4", "B3", "B2"], min: 5000, max: 15000 },
-            bands: ["B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9", "B10", "B11"]
+            bands: ["B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9", "B10", "B11"],
+            sortType: {
+                time: "system:time_start",
+                cloud: "CLOUD_COVER"
+            }
         },
     };
 } else {

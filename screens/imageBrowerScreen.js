@@ -9,28 +9,18 @@ if (_G.loadedFiles[filePath] == null) {
     var ImageCollectionViewr = require("users/sunriverkun/gee_test:widgets/imageCollectionViewr.js");
     var FeatureDrawer = require("users/sunriverkun/gee_test:widgets/featureDrawer.js");
 
-    var provinceNames = null;
-    var provincesData = ee.FeatureCollection("projects/ee-sunriverkun/assets/china_province"); //省区
-    provincesData.aggregate_array("省区").evaluate(function (list) { provinceNames = list; });
+    var defaultCollectionTypes = _G.imageParams;
+    var defaultCollectionType = "LANDSAT/LC08/C01/T1_SR";
+    var noneType = "_none_";
+    var intersectType = "_intersect_";
 
-    var cityNames = null;
-    var citysData = ee.FeatureCollection("projects/ee-sunriverkun/assets/china_city");  //地市
-    citysData.aggregate_array("地市").evaluate(function (list) { cityNames = list; });
-
-    var divCh = "；";
-
-    var defaultCollectionTypes = {
-        "Landsat-8-T1_SR": { c: "LANDSAT/LC08/C01/T1_SR", des: "Landsat 8, Collection 1, Tier 1 + Real Time" },
-        "Landsat-8-T1": { c: "LANDSAT/LC08/C01/T1", des: "Landsat 8, Collection 1, Tier 1" }
-    };
-    var defaultCollectionType = "Landsat-8-T1_SR";
 
     exports.new = function (onChooseClick, collectionTypes, defaultType) {
         var panel = ui.Panel(null, ui.Panel.Layout.flow("vertical"));
         var self = {
             c: exports,
             widget: panel,
-            onChooseClick : onChooseClick
+            onChooseClick: onChooseClick
         };
         //参数预处理
         collectionTypes = collectionTypes ? collectionTypes : defaultCollectionTypes;
@@ -43,12 +33,16 @@ if (_G.loadedFiles[filePath] == null) {
         //类型
         self.cltTypes = collectionTypes;
         self.cltTypeDesLabel = ui.Label(collectionTypes[defaultType].des != null ? collectionTypes[defaultType].des : "", _G.styles.des);
-        self.cltTypeSelect = ui.Select(Object.keys(self.cltTypes), "图像来源", defaultType, _G.handler(self, exports.onImageCollectionChange));
+        self.cltTypeSelect = ui.Select(Object.keys(self.cltTypes), "选择图像来源", defaultType, _G.handler(self, exports.onImageCollectionChange));
+        self.cltSortSelect = ui.Select([noneType, intersectType], "选择排序方式", noneType);
+        self.cltAscendingCheck = ui.Checkbox("升序", true);
+        exports.onImageCollectionChange(self, defaultType);
 
-        menu = SubMenu.new("🧾图像来源", titleStyle);
+        menu = SubMenu.new("🧾图像设置", titleStyle);
         panel.add(menu.widget);
         SubMenu.add(menu, self.cltTypeDesLabel);
-        SubMenu.add(menu, self.cltTypeSelect);
+        SubMenu.add(menu, _G.horizontals([ui.Label("图片来源"), self.cltTypeSelect], true));
+        SubMenu.add(menu, _G.horizontals([ui.Label("排序方式"), self.cltSortSelect, self.cltAscendingCheck], true));
         //地区
         self.featureDrawer = FeatureDrawer.new();
 
@@ -90,20 +84,48 @@ if (_G.loadedFiles[filePath] == null) {
 
     //类型
     exports.onImageCollectionChange = function (self, type) {
-        self.cltTypeDesLabel.setValue(self.cltTypes[type].des != null ? self.cltTypes[type].des : "");
+        var typeData = self.cltTypes[type];
+        var sortType = Object.keys(self.cltTypes[type].sortType);
+        sortType.unshift(noneType, intersectType);
+
+        self.cltTypeDesLabel.setValue(typeData.des != null ? typeData.des : "");
+        self.cltSortSelect.items().reset(sortType);
+        self.cltSortSelect.setValue(null, false);
+        self.cltSortSelect.setValue(noneType, true);
+
     };
-    
+
     //图像选择
     exports.onSearchButtonClick = function (self) {
-        var geometry = FeatureDrawer.getGeometry(self.featureDrawer);
-        var typeData = self.cltTypes[self.cltTypeSelect.getValue()];
-        var cloudValue = parseInt(self.cloudTex.getValue());
-        var collection = ee.ImageCollection(typeData.c)
-            .filterDate(self.startTimeTex.getValue(), self.endTimeTex.getValue())
-            .filter(ee.Filter.lte('CLOUD_COVER', cloudValue));
-        if (geometry != null) { collection = collection.filterBounds(geometry); }
+        var cloudValue = _G.Astr2UInt((self.cloudTex.getValue()), "云量应为非负整数");
+        if (cloudValue == null) { return; }
 
-        var visParams = _G.getImageVisualParams(typeData.c, true);
+        var geometry = FeatureDrawer.getGeometry(self.featureDrawer);
+
+        var type = self.cltTypeSelect.getValue();
+        var typeData = self.cltTypes[type];
+        var cloud = typeData.sortType.cloud;
+        var sortType = self.cltSortSelect.getValue();
+
+        var collection = ee.ImageCollection(type)
+            .filterDate(self.startTimeTex.getValue(), self.endTimeTex.getValue())
+            .filter(ee.Filter.lte(cloud, cloudValue));
+        if (geometry != null) { collection = collection.filterBounds(geometry); }
+        if (sortType == intersectType) {
+            if (geometry == null) { alert("未绘制研究区域，无法根据相交区域排序"); return; }
+            else {
+                collection = collection.map(function (image) {
+                    var area = image.geometry().intersection(geometry, 100).area();
+                    var table = {};
+                    table[intersectType] = area;
+                    return image.set(table);
+                });
+                collection = collection.sort(intersectType, self.cltAscendingCheck.getValue());
+            }
+        }
+        if (sortType != null && sortType != noneType && sortType != intersectType) { collection = collection.sort(typeData.sortType[sortType], self.cltAscendingCheck.getValue()); }
+
+        var visParams = _G.getImageVisualParams(type, true);
         var viewr = ImageCollectionViewr.new(collection, visParams, visParams, geometry, self.onChooseClick);
         self.resultPanel.clear();
         self.resultPanel.add(viewr.widget);
