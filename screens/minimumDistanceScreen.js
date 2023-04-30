@@ -14,8 +14,7 @@ if (_G.loadedFiles[filePath] == null) {
 
         self.metricTypes = {
             "欧几里": "euclidean",
-            "余弦": "cosine",
-            "马氏": "mahalanobis"
+            "余弦": "cosine"
         };
         self.metricLabel = ui.Label("距离函数");
         self.metricSelect = ui.Select(Object.keys(self.metricTypes), "请选择距离函数", "欧几里");
