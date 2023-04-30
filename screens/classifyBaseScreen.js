@@ -4,8 +4,8 @@ if (_G.loadedFiles[filePath] == null) {
     _G.loadedFiles[filePath] = exports;
     print("Load " + filePath);
 
+    var ImageChooser = require("users/sunriverkun/gee_test:widgets/imageChooser.js");
     var MapDrawer = require("users/sunriverkun/gee_test:widgets/mapDrawer.js");
-    var ImageBrowerScreen = require("users/sunriverkun/gee_test:screens/imageBrowerScreen.js");
 
     var divCh = ";";
     var classProperty = "landcover";
@@ -19,8 +19,6 @@ if (_G.loadedFiles[filePath] == null) {
             widget: panel,
             title: title ? title : "Title",
             titleDes: titleDes ? titleDes : "",
-            imageName: "",
-            image: null,
             classifyVisParams: { min: 0, max: 1, palette: null }
         };
         return self;
@@ -34,14 +32,11 @@ if (_G.loadedFiles[filePath] == null) {
 
         panel.add(self.titleLabel);
         panel.add(self.titleDesLabel);
-        //图像输入
-        self.imageLabel = ui.Label("遥感图像名");
-        self.imageNameTex = ui.Textbox("", "");
-        self.chooseButton = ui.Button("选择", _G.handler(self, exports.onChooseButtonClick));
-        panel.add(_G.horizontals([self.imageLabel, self.imageNameTex, self.chooseButton], true));
-
+        //图像输入        
+        self.imageChooser = ImageChooser.new(false, _G.handler(self, exports.onSetNameCb));
         self.bandsLabel = ui.Label("分类波段名");
-        self.bandsTex = ui.Textbox("以;分割每个波段名", "");
+        self.bandsTex = ui.Textbox("以" + divCh + "分割每个波段名", "");
+        panel.add(self.imageChooser.widget);
         panel.add(_G.horizontals([self.bandsLabel, self.bandsTex]));
         //算法参数
         self.argsPanel = ui.Panel();
@@ -63,14 +58,12 @@ if (_G.loadedFiles[filePath] == null) {
 
 
         exports.setPoints(self, null);
-        exports.setImageName(self, "LANDSAT/LC08/C01/T1_SR/LC08_192024_20160624");
+        ImageChooser.setImageName(self.imageChooser, "LANDSAT/LC08/C01/T1_SR/LC08_192024_20160624");
 
         return self;
     };
 
-    exports.setImageName = function (self, name) {
-        self.imageName = name;
-        self.imageNameTex.setValue(name);
+    exports.onSetNameCb = function (self, name) {
         self.bandsTex.setValue(_G.getImageBands(name).join(divCh));
         exports.setPoints(self, null);
     }
@@ -101,23 +94,7 @@ if (_G.loadedFiles[filePath] == null) {
     }
 
     exports.getShowImage = function (self) {
-        var name = self.imageNameTex.getValue();
-        if (name == "") { return null; }
-
-        var zoom = 10;
-        if (_G.isNotVaildImageName(name)) {
-            if (self.imageName == name && self.image != null) {
-                Map.centerObject(self.image, zoom);
-                _G.rawAddLayerOrHideBefore(self.image, _G.getImageVisualParams(name), name);
-                return self.image
-            } else {
-                alert("遥感图像名错误，如需使用裁剪或合成的图像，点击选择按钮");
-                return null;
-            }
-        } else {
-            _G.addLayerOrHideBefore(name, true, zoom);
-            return ee.Image(name);
-        }
+        return ImageChooser.getShowImage(self.imageChooser);
     }
 
     exports.openMapDrawScreen = function (self) {
@@ -135,34 +112,26 @@ if (_G.loadedFiles[filePath] == null) {
         }, null, true, "point");
     };
 
-    exports.onChooseButtonClick = function (self) {
-        var screen = ImageBrowerScreen.new(function (image, imageName) {
-            self.image = image;
-            exports.setImageName(self, imageName);
-            _G.popScreen();
-        });
-        _G.pushScreen(screen);
-    }
-
     //abstract
     exports.getClassifier = function (self) {
         return null;
     }
 
     exports.onClass = function (self) {
-        var image = exports.getShowImage(self);
-        if (image == null) { return; }
-
-        var imageName = self.imageNameTex.getValue();
-        if (imageName == "") { alert("遥感图像名不应为空"); return; }
         var points = exports.getPoints(self);  //FeatureCollection
         if (points == null) { alert("未绘制样板点"); return; }
 
+        var bands = exports.getBands(self);
+        if(bands==null || bands.length == 0) { alert("未填写分类波段名称"); return; }
+
+        var image = exports.getShowImage(self);
+        if (image == null) { return; }
+
         var classifier = self.c.getClassifier(self);
-        if(classifier == null) { return; }
+        if (classifier == null) { return; }
 
         var classProperty = exports.getClassProperty();
-        var bands = exports.getBands(self);
+
         var training = image.select(bands).sampleRegions({
             collection: points,
             properties: [classProperty],
