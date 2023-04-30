@@ -29,6 +29,17 @@ if (_G.loadedFiles[filePath] == null) {
             }
         },
     };
+    for(var k in exports.imageParams){
+        var data = exports.imageParams[k];
+        if(data.visParams!=null && data.compositeParams==null){
+            data.compositeParams = {};
+            for(var key in data.visParams){
+                data.compositeParams[key] = data.visParams[key];
+                if(key == "max") { data.compositeParams[key] = data.visParams[key]/1.5; }
+            }
+        }
+    }
+
 } else {
     exports = _G.loadedFiles[filePath];
 }

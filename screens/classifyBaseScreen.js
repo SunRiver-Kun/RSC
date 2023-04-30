@@ -43,7 +43,6 @@ if (_G.loadedFiles[filePath] == null) {
         self.bandsLabel = ui.Label("分类波段名");
         self.bandsTex = ui.Textbox("以;分割每个波段名", "");
         panel.add(_G.horizontals([self.bandsLabel, self.bandsTex]));
-        exports.setImageName(self, "LANDSAT/LC08/C01/T1_SR/LC08_192024_20160624");
         //算法参数
         self.argsPanel = ui.Panel();
         if (self.argsWidget) { self.argsPanel.add(self.argsWidget); }
@@ -57,11 +56,14 @@ if (_G.loadedFiles[filePath] == null) {
         self.pointsOkLabel = ui.Label("");
         panel.add(_G.horizontals([self.pointsLabel, self.pointsButton, self.pointsOkLabel]));
 
-        exports.setPoints(self, null);
         //分类，取消
         self.classButton = ui.Button("分类", _G.handler(self, exports.onClass));
         self.cancelButton = ui.Button("取消", function () { _G.popScreen(); });
         panel.add(_G.horizontals([self.classButton, self.cancelButton]));
+
+
+        exports.setPoints(self, null);
+        exports.setImageName(self, "LANDSAT/LC08/C01/T1_SR/LC08_192024_20160624");
 
         return self;
     };
@@ -70,6 +72,7 @@ if (_G.loadedFiles[filePath] == null) {
         self.imageName = name;
         self.imageNameTex.setValue(name);
         self.bandsTex.setValue(_G.getImageBands(name).join(divCh));
+        exports.setPoints(self, null);
     }
 
     exports.getBands = function (self) {
@@ -102,13 +105,13 @@ if (_G.loadedFiles[filePath] == null) {
         if (name == "") { return null; }
 
         var zoom = 10;
-        if (_G.isClipImageName(name)) {
+        if (_G.isNotVaildImageName(name)) {
             if (self.imageName == name && self.image != null) {
                 Map.centerObject(self.image, zoom);
                 _G.rawAddLayerOrHideBefore(self.image, _G.getImageVisualParams(name), name);
                 return self.image
             } else {
-                alert("遥感图像名错误，裁剪后图像名被修改，或是直接使用了裁剪后图像名");
+                alert("遥感图像名错误，如需使用裁剪或合成的图像，点击选择按钮");
                 return null;
             }
         } else {

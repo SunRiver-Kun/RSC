@@ -3,7 +3,8 @@ var _G = Number.prototype._G;
 _G.loadedFiles = {};    //加载过的文件列表，避免require时多次执行代码
 _G.styles = require("users/sunriverkun/gee_test:styles.js");
 _G.imageParams = _G.styles.imageParams;
-_G.clipImageHead = "clip+";
+_G.clipImageHead = "clip-";
+_G.compositeImageTail = "+composite";
 
 
 require("users/sunriverkun/gee_test:functions.js");

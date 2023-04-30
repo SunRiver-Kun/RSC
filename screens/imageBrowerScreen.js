@@ -4,10 +4,11 @@ if (_G.loadedFiles[filePath] == null) {
     _G.loadedFiles[filePath] = exports;
     print("Load " + filePath);
 
-    var MapDrawer = require("users/sunriverkun/gee_test:widgets/mapDrawer.js");
     var SubMenu = require("users/sunriverkun/gee_test:widgets/subMenu.js");
-    var ImageCollectionViewr = require("users/sunriverkun/gee_test:widgets/imageCollectionViewr.js");
     var FeatureDrawer = require("users/sunriverkun/gee_test:widgets/featureDrawer.js");
+    var ImageCollectionViewr = require("users/sunriverkun/gee_test:widgets/imageCollectionViewr.js");
+    var ImageCollectionCompositer = require("users/sunriverkun/gee_test:widgets/imageCollectionCompositer.js");
+
 
     var defaultCollectionTypes = _G.imageParams;
     var defaultCollectionType = "LANDSAT/LC08/C01/T1_SR";
@@ -36,13 +37,14 @@ if (_G.loadedFiles[filePath] == null) {
         self.cltTypeSelect = ui.Select(Object.keys(self.cltTypes), "选择图像来源", defaultType, _G.handler(self, exports.onImageCollectionChange));
         self.cltSortSelect = ui.Select([noneType, intersectType], "选择排序方式", noneType);
         self.cltAscendingCheck = ui.Checkbox("升序", true);
-        exports.onImageCollectionChange(self, defaultType);
+        self.compositeSelect = ui.Select(["一般影像", "合成影像"], "选择输出类型", "一般影像");
 
         menu = SubMenu.new("🧾图像设置", titleStyle);
         panel.add(menu.widget);
         SubMenu.add(menu, self.cltTypeDesLabel);
         SubMenu.add(menu, _G.horizontals([ui.Label("图片来源"), self.cltTypeSelect], true));
         SubMenu.add(menu, _G.horizontals([ui.Label("排序方式"), self.cltSortSelect, self.cltAscendingCheck], true));
+        SubMenu.add(menu, _G.horizontals([ui.Label("输出类型"), self.compositeSelect], true));
         //地区
         self.featureDrawer = FeatureDrawer.new();
 
@@ -77,7 +79,7 @@ if (_G.loadedFiles[filePath] == null) {
         SubMenu.add(menu, _G.horizontals([self.searchButton, self.resultLabel]));
         SubMenu.add(menu, self.resultPanel);
         //default
-
+        exports.onImageCollectionChange(self, defaultType);
 
         return self;
     };
@@ -125,8 +127,16 @@ if (_G.loadedFiles[filePath] == null) {
         }
         if (sortType != null && sortType != noneType && sortType != intersectType) { collection = collection.sort(typeData.sortType[sortType], self.cltAscendingCheck.getValue()); }
 
-        var visParams = _G.getImageVisualParams(type, true);
-        var viewr = ImageCollectionViewr.new(collection, visParams, visParams, geometry, self.onChooseClick);
+
+        var viewr = null;
+        if (self.compositeSelect.getValue() == "合成影像") {
+            var visParams = _G.getImageVisualParams(type + _G.compositeImageTail);
+            viewr = ImageCollectionCompositer.new(collection, visParams, visParams, geometry, self.onChooseClick, null, type);
+        } else {
+            var visParams = _G.getImageVisualParams(type + "/name");
+            viewr = ImageCollectionViewr.new(collection, visParams, visParams, geometry, self.onChooseClick);
+        }
+
         self.resultPanel.clear();
         self.resultPanel.add(viewr.widget);
     };

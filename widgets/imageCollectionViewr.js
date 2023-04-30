@@ -16,7 +16,7 @@ if (_G.loadedFiles[filePath] == null) {
             collectionLength: null,
             selectedIndex: null,
             image: null,
-            imageId: "",
+            imageId: null,
             readyToChoose: false
         };
         self.prevButton = ui.Button("上一张", _G.handler(self, exports.onPrevButtonClick), true);
@@ -57,6 +57,11 @@ if (_G.loadedFiles[filePath] == null) {
         return self.clipGeo && self.clipCheck.getValue() ? self.image.clip(self.clipGeo) : self.image;
     };
 
+    exports.getImageId = function (self) {
+        if (self.imageId == null) { return null; }
+        return self.clipCheck.getValue() ? _G.clipImageHead + self.imageId : self.imageId;
+    };
+
     exports.setImageByIndex = function (self, index) {
         self.readyToChoose = false;
 
@@ -67,7 +72,7 @@ if (_G.loadedFiles[filePath] == null) {
 
         if (self.collectionLength == 0) {
             _G.hide(self.thumbnail);
-            self.orderLabel.setValue("Index: 0/0");
+            self.orderLabel.setValue("!未找到图像!");
             self.prevButton.setDisabled(true);
             self.nextButton.setDisabled(true);
             return;
@@ -121,9 +126,7 @@ if (_G.loadedFiles[filePath] == null) {
 
     exports.onChooseButtonClick = function (self) {
         if (self.readyToChoose && self.onChooseClick) {
-            var image = exports.getImage(self);
-            var name = image == self.image ? self.imageId : _G.clipImageHead + self.imageId;
-            self.onChooseClick(image, name, self);
+            self.onChooseClick(exports.getImage(self), exports.getImageId(self), self);
         } else {
             print("[Waring]: image is not ready to choose");
         }
@@ -131,7 +134,7 @@ if (_G.loadedFiles[filePath] == null) {
 
     exports.onDownloadButtonClick = function (self) {
         if (self.readyToChoose && self.onDownloadClick) {
-            self.onDownloadClick(self);
+            self.onDownloadClick(exports.getImage(self), exports.getImageId(self), self);
         } else {
             print("[Waring]: image is not ready to download");
         }

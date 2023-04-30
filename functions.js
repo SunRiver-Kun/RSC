@@ -124,16 +124,31 @@ if (_G.loadedFiles[filePath] == null) {
         return imageName.startsWith(_G.clipImageHead);
     };
 
-    _G.getImageParams = function (imageName, isRaw) {
-        var type = null;
-        if (isRaw) {
-            type = imageName;
-        } else {
-            var start = imageName.indexOf("+") + 1;
-            var end = imageName.lastIndexOf("/");
-            if (end == -1) { end = undefined; }
-            type = imageName.substring(start, end);
+    _G.isCompositeImageName = function (imageName) {
+        return imageName.endsWith(_G.compositeImageTail);
+    };
+
+    _G.isNotVaildImageName = function (imageName) {
+        if (imageName == null || imageName == "") { return true; }
+        var notValidCh = ["-", "+"];
+        for (var i = 0; i < notValidCh.length; ++i) {
+            if (imageName.indexOf(notValidCh[i]) != -1) {
+                return true;
+            }
         }
+        return false;
+    }
+
+    _G.getImageType = function (imageName) {
+        //[clip-]from/id    [clip-]from+composite
+        var start = imageName.indexOf("-") + 1;
+        var end = imageName.lastIndexOf("+");
+        if (end == -1) { end = imageName.lastIndexOf("/");; }
+        return imageName.substring(start, end == -1 ? undefined : end);
+    };
+
+    _G.getImageParams = function (imageName) {
+        var type = _G.getImageType(imageName);
         var params = _G.imageParams[type];
         if (!params) {
             print("[Waring]:_G.getImageParams can't find imageParams for", imageName, type);
@@ -142,40 +157,44 @@ if (_G.loadedFiles[filePath] == null) {
         return params;
     };
 
-    _G.getImageVisualParams = function (imageName, isRaw) {
-        var visParams = _G.getImageParams(imageName, isRaw).visParams;
-        if (!visParams) {
-            print("[Waring]:_G.getImageVisualParams can't find visParams for", imageName, type);
+    _G.getImageParamsValue = function (imageName, key, defautlValue, errorLevel) {
+        if (errorLevel == undefined) { errorLevel = 1; }
+        var params = _G.getImageParams(imageName);
+        var value = params[key];
+        if (value == null && errorLevel > 0) {
+            print((errorLevel == 1 ? "[Waring]" : "[Error]") + ": _G.getImageParamsValue can't find " + key + " for ", imageName);
+        }
+        return value != null ? value : defautlValue;
+    };
+
+    _G.getImageVisualParams = function (imageName) {
+        var params = _G.getImageParams(imageName);
+        var visParams = params.visParams;
+        if (visParams == null || (params.compositeParams != null && _G.isCompositeImageName(imageName))) { visParams = params.compositeParams; }
+        if (visParams == null) {
+            print("[Waring]:_G.getImageVisualParams can't find visParams or compositeParams for", imageName);
             return {};
         }
         return visParams;
     };
 
-    _G.getImageBands = function (imageName, isRaw) {
-        var bands = _G.getImageParams(imageName, isRaw).bands;
-        if (!bands) {
-            print("[Waring]:_G.getImageBands can't find bands for", imageName, type);
-            return {};
-        }
-        return bands;
-    };
+    _G.getImageDes = function (imageName) { return _G.getImageParamsValue(imageName, "des", ""); };
+    _G.getImageBaseVisParams = function (imageName) { return _G.getImageParamsValue(imageName, "visParams", {}); };
+    _G.getImageCopVisParams = function (imageName) { return _G.getImageParamsValue(imageName, "compositeParams", {}); };
+    _G.getImageBands = function (imageName) { return _G.getImageParamsValue(imageName, "bands", []); };
+    _G.getImageSortType = function (imageName) { return _G.getImageParamsValue(imageName, "sortType", {}); };
 
     _G.addLayer = function (imageName, focus, zoom) {
-        if (imageName == null || imageName == "" || _G.isClipImageName(imageName)) { print("[ERROR]: _G.addLayer imageName of ", imageName); return null; }
-        for (var type in _G.imageParams) {
-            if (imageName.indexOf(type) != -1) {
-                var image = ee.Image(imageName);
-                var layer = Map.addLayer(image, _G.getImageVisualParams(imageName), imageName);
-                if (focus) { Map.centerObject(image, zoom); }
-                return layer;
-            }
-        }
-        print("[ERROR]: _G.addLayer unknow type of " + imageName);
-        return null;
+        if (_G.isNotVaildImageName(imageName)) { print("[ERROR]: _G.addLayer imageName of ", imageName); return null; }
+
+        var image = ee.Image(imageName);
+        var layer = Map.addLayer(image, _G.getImageVisualParams(imageName), imageName);
+        if (focus) { Map.centerObject(image, zoom); }
+        return layer;
     };
 
     _G.addLayerOrHideBefore = function (imageName, focus, zoom) {
-        if (imageName == null || imageName == "" || _G.isClipImageName(imageName)) { print("[ERROR]: _G.addLayerOrHideBefore imageName of ", imageName); return null; }
+        if (_G.isNotVaildImageName(imageName)) { print("[ERROR]: _G.addLayerOrHideBefore imageName of ", imageName); return null; }
 
         var layers = Map.layers();
         var index = null;

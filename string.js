@@ -15,6 +15,20 @@ if (_G.loadedFiles[filePath] == null) {
         return true;
     };
 
+    _S.endsWith = function (str) {
+        if (this.length < str.length) { return false; }
+
+        var index = this.length - 1;
+        var strindex = str.length - 1;
+        while(strindex >= 0){
+            if(this[index] != str[strindex]) { return false; }
+            --index;
+            --strindex;
+        }
+
+        return true;
+    }
+
 } else {
 
 }
