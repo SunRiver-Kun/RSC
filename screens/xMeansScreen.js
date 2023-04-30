@@ -24,44 +24,27 @@ if (_G.loadedFiles[filePath] == null) {
         self.maxIterationsTex = ui.Textbox("", "3");
         panel.add(_G.horizontals([self.maxIterationsLabel, self.maxIterationsTex]));
 
-        ClusterBaseScreen.setOnClass(self, exports.onClass);
         ClusterBaseScreen.setArgsWidget(self, panel);
         ClusterBaseScreen.init(self);
 
         return self;
     };
 
-    exports.onClass = function (self, image) {
-        var imageName = self.imageNameTex.getValue();
-        if (imageName == "") { alert("遥感图像名不应为空"); }
+    exports.getClassifier = function (self) {
         var minClusters = _G.Astr2PInt(self.minClustersTex.getValue(), "最小聚类数应为正整数");
         var maxClusters = _G.Astr2PInt(self.maxClustersTex.getValue(), "最大聚类数应为正整数");
 
         var maxIterations = parseInt(self.maxIterationsTex.getValue());
-        if (isNaN(maxIterations) || maxIterations < 1) { maxIterations = null; }
+        if (isNaN(maxIterations) || maxIterations < 1) { maxIterations = undefined; }
 
-        if (imageName == "" || minClusters == null || maxClusters == null) {
-            print("分类失败，参数错误");
-            return;
-        }
-        if (minClusters > maxClusters) { alert("最小聚类数不应大于最大聚类数"); return; }
+        if (minClusters == null || maxClusters == null) { return null; }
+        if (minClusters > maxClusters) { alert("最小聚类数不应大于最大聚类数"); return null; }
 
-        var input = image != null ? image : ee.Image(imageName);
-        print("input", input);
-        var training = input.sample({
-            region: self.region,
-            scale: 30,
-            numPixels: 5000
-        });
-        print("training", training);
-        var clusterer = ee.Clusterer.wekaXMeans({
+        return ee.Clusterer.wekaXMeans({
             minClusters: minClusters,
             maxClusters: maxClusters,
             maxIterations: maxIterations
-        }).train(training);
-        var result = input.cluster(clusterer).randomVisualizer();
-        print("result", result);
-        Map.addLayer(result, {}, "XMeans");
+        });
     };
 
 } else {

@@ -93,12 +93,12 @@ if (_G.loadedFiles[filePath] == null) {
         return self.classifyVisParams;
     }
 
-    exports.getShowImage = function (self) {
-        return ImageChooser.getShowImage(self.imageChooser);
+    exports.getShowImage = function (self, zoom) {
+        return ImageChooser.getShowImage(self.imageChooser, zoom);
     }
 
     exports.openMapDrawScreen = function (self) {
-        if (exports.getShowImage(self) == null) { return; }
+        if (exports.getShowImage(self, 10) == null) { return; }
         var mapDrawScreen = MapDrawer.new({ title: "请绘制样板点", des: "(每个图层一个样板类型)" }, function (geoLayers) {
             var length = geoLayers.length();
             var palette = [];
@@ -124,11 +124,11 @@ if (_G.loadedFiles[filePath] == null) {
         var bands = exports.getBands(self);
         if(bands==null || bands.length == 0) { alert("未填写分类波段名称"); return; }
 
-        var image = exports.getShowImage(self);
-        if (image == null) { return; }
-
         var classifier = self.c.getClassifier(self);
         if (classifier == null) { return; }
+
+        var image = exports.getShowImage(self);
+        if (image == null) { return; }
 
         var classProperty = exports.getClassProperty();
 

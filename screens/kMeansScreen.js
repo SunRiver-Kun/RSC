@@ -20,38 +20,21 @@ if (_G.loadedFiles[filePath] == null) {
         self.maxIterationsTex = ui.Textbox("", "");
         panel.add(_G.horizontals([self.maxIterationsLabel, self.maxIterationsTex]));
 
-        ClusterBaseScreen.setOnClass(self, exports.onClass);
         ClusterBaseScreen.setArgsWidget(self, panel);
         ClusterBaseScreen.init(self);
 
         return self;
     };
 
-    exports.onClass = function (self, image) {
-        var imageName = self.imageNameTex.getValue();
-        if (imageName == "") { alert("遥感图像名不应为空"); return; }
-
-        var nClusters = parseInt(self.nClustersTex.getValue());
-        if (isNaN(nClusters) || nClusters < 1) { alert("聚类数应为正整数"); return; }
-
+    exports.getClassifier = function (self) {
+        var nClusters = _G.Astr2PInt(self.nClustersTex.getValue(), "聚类数应为正整数");
         var maxIterations = parseInt(self.maxIterationsTex.getValue());
-        if (isNaN(maxIterations) || maxIterations < 1) { maxIterations = null; }
+        if (isNaN(maxIterations) || maxIterations < 1) { maxIterations = undefined; }
 
-        var input = image != null ? image : ee.Image(imageName);
-        print("input", input);
-        var training = input.sample({
-            region: self.region,
-            scale: 30,
-            numPixels: 5000
-        });
-        print("training", training);
-        var clusterer = ee.Clusterer.wekaKMeans({
+        return ee.Clusterer.wekaKMeans({
             nClusters: nClusters,
             maxIterations: maxIterations
-        }).train(training);
-        var result = input.cluster(clusterer).randomVisualizer();
-        print("result", result);
-        Map.addLayer(result, {}, "KMeans");
+        });
     };
 
 } else {
