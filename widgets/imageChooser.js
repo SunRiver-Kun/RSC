@@ -28,18 +28,18 @@ if (_G.loadedFiles[filePath] == null) {
         var name = self.imageNameTex.getValue();
         if (name == "") { alert("遥感图像名为空"); return null; }
 
-        if (_G.isNotVaildImageName(name)) {
-            if (self.imageName == name && self.image != null) {
-                Map.centerObject(self.image, zoom);
-                _G.rawAddLayerOrHideBefore(self.image, _G.getImageVisualParams(name), name);
-                return self.image
-            } else {
+        if (self.imageName == name && self.image != null) {
+            Map.centerObject(self.image, zoom);
+            _G.rawAddLayerOrHideBefore(self.image, _G.getImageVisualParams(name), name);
+            return self.image
+        } else {
+            if (_G.isNotVaildImageName(name)) {
                 alert("遥感图像名错误，如需使用裁剪或合成的图像，点击选择按钮");
                 return null;
+            } else {
+                _G.addLayerOrHideBefore(name, true, zoom);
+                return ee.Image(name);
             }
-        } else {
-            _G.addLayerOrHideBefore(name, true, zoom);
-            return ee.Image(name);
         }
     };
 
@@ -47,22 +47,22 @@ if (_G.loadedFiles[filePath] == null) {
         var name = self.imageNameTex.getValue();
         if (name == "") { alert("遥感图像名为空"); return null; }
 
-        if (_G.isNotVaildImageName(name)) {
-            if (self.imageName == name && self.image != null) {
-                return self.image
-            } else {
+        if (self.imageName == name && self.image != null) {
+            return self.image
+        } else {
+            if (_G.isNotVaildImageName(name)) {
                 alert("遥感图像名错误，如需使用裁剪或合成的图像，点击选择按钮");
                 return null;
+            } else {
+                return ee.Image(name);
             }
-        } else {
-            return ee.Image(name);
         }
     };
 
     exports.setImageName = function (self, name) {
         self.imageName = name;
         self.imageNameTex.setValue(name);
-        if(self.onSetNameCb) { self.onSetNameCb(name, self); }
+        if (self.onSetNameCb) { self.onSetNameCb(name, self); }
     };
 
     exports.onChooseButtonClick = function (self) {

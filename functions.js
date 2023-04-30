@@ -182,6 +182,7 @@ if (_G.loadedFiles[filePath] == null) {
     _G.getImageBaseVisParams = function (imageName) { return _G.getImageParamsValue(imageName, "visParams", {}); };
     _G.getImageCopVisParams = function (imageName) { return _G.getImageParamsValue(imageName, "compositeParams", {}); };
     _G.getImageBands = function (imageName) { return _G.getImageParamsValue(imageName, "bands", []); };
+    _G.getImageCloudBand = function (imageName) { return _G.getImageParamsValue(imageName, "cloudBand", null); };
     _G.getImageSortType = function (imageName) { return _G.getImageParamsValue(imageName, "sortType", {}); };
 
     _G.addLayer = function (imageName, focus, zoom) {

@@ -25,7 +25,7 @@ if (_G.loadedFiles[filePath] == null) {
         self.downloadButton = ui.Button("下载", _G.handler(self, exports.onDownloadButtonClick));
 
 
-        self.clipCheck = ui.Checkbox("裁剪", clipGeo != null, _G.handler(self, exports.onClipCheckChange), undefined, { shown: clipGeo != null });
+        self.clipCheck = ui.Checkbox("裁剪", false, _G.handler(self, exports.onClipCheckChange), undefined, { shown: clipGeo != null });
         self.thumbnail = ui.Thumbnail({ params: thumbnailParams, onClick: _G.handler(self, exports.onThumbnailClick) });
         self.idLabel = ui.Label("ID: ", { margin: "2px 0" });
         self.dateLabel = ui.Label("Data: ", { margin: "2px 0" });

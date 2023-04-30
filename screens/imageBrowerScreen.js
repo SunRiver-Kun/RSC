@@ -62,11 +62,12 @@ if (_G.loadedFiles[filePath] == null) {
         SubMenu.add(menu, _G.horizontals([ui.Label("结束时间"), self.endTimeTex], true));
         //云量
         self.cloudTex = ui.Textbox("0~100", "5", null, false, { width: "40px" });
+        self.clearCloudCheck = ui.Checkbox("自动去云", false);
 
-        menu = SubMenu.new("⛅云量占比", titleStyle);
+        menu = SubMenu.new("⛅云量设置", titleStyle);
         panel.add(menu.widget);
         SubMenu.add(menu, ui.Label("云量占比越大云越多, 0~100的整数", _G.styles.des));
-        SubMenu.add(menu, _G.horizontals([ui.Label("云量占比小于等于"), self.cloudTex], true));
+        SubMenu.add(menu, _G.horizontals([ui.Label("云量占比 ≤ "), self.cloudTex, self.clearCloudCheck], true));
 
         //图像选择
         self.searchButton = ui.Button("搜索图像🔍", _G.handler(self, exports.onSearchButtonClick), false, { stretch: "horizontal" });
@@ -98,9 +99,26 @@ if (_G.loadedFiles[filePath] == null) {
     };
 
     //图像选择
+    function getClearCloudCollection(collection, type) {
+        var cloudBand = _G.getImageCloudBand(type + _G.compositeImageTail);
+        if (cloudBand == null) { return collection; }
+        return collection.map(function (image) {
+            var qa = image.select(cloudBand);
+            // If the cloud bit (5) is set and the cloud confidence (7) is high
+            // or the cloud shadow bit is set (3), then it's a bad pixel.
+            var cloud = qa.bitwiseAnd(1 << 5)
+                .and(qa.bitwiseAnd(1 << 7))
+                .or(qa.bitwiseAnd(1 << 3))
+            //删除所有波段中不出现的边缘像素
+            var mask2 = image.mask().reduce(ee.Reducer.min());
+            return image.updateMask(cloud.not()).updateMask(mask2);
+        });
+    };
+
     exports.onSearchButtonClick = function (self) {
-        var cloudValue = _G.Astr2UInt((self.cloudTex.getValue()), "云量应为非负整数");
+        var cloudValue = _G.Astr2UInt((self.cloudTex.getValue()), "云量的范围在0~100");
         if (cloudValue == null) { return; }
+        if (cloudValue < 0 || cloudValue > 100) { alert("云量的范围在0~100"); return; }
 
         var geometry = FeatureDrawer.getGeometry(self.featureDrawer);
 
@@ -127,6 +145,7 @@ if (_G.loadedFiles[filePath] == null) {
         }
         if (sortType != null && sortType != noneType && sortType != intersectType) { collection = collection.sort(typeData.sortType[sortType], self.cltAscendingCheck.getValue()); }
 
+        if (self.clearCloudCheck.getValue()) { collection = getClearCloudCollection(collection, type); }
 
         var viewr = null;
         if (self.compositeSelect.getValue() == "合成影像") {
