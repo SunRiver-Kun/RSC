@@ -37,7 +37,7 @@ if (_G.loadedFiles[filePath] == null) {
         self.cltTypeSelect = ui.Select(Object.keys(self.cltTypes), "选择图像来源", defaultType, _G.handler(self, exports.onImageCollectionChange));
         self.cltSortSelect = ui.Select([noneType, intersectType], "选择排序方式", noneType);
         self.cltAscendingCheck = ui.Checkbox("升序", true);
-        self.compositeSelect = ui.Select(["一般影像", "合成影像"], "选择输出类型", "一般影像");
+        self.compositeSelect = ui.Select(["一般影像", "合成影像"], "选择输出类型", "一般影像", _G.handler(self, exports.onCompositeSelectChange));
 
         menu = SubMenu.new("🧾图像设置", titleStyle);
         panel.add(menu.widget);
@@ -81,6 +81,7 @@ if (_G.loadedFiles[filePath] == null) {
         SubMenu.add(menu, self.resultPanel);
         //default
         exports.onImageCollectionChange(self, defaultType);
+        exports.onCompositeSelectChange(self, "一般影像")
 
         return self;
     };
@@ -97,6 +98,12 @@ if (_G.loadedFiles[filePath] == null) {
         self.cltSortSelect.setValue(noneType, true);
 
     };
+
+
+    exports.onCompositeSelectChange = function (self, type) {
+        var isComposite = type=="合成影像";
+        self.clearCloudCheck.setValue(isComposite);
+    }
 
     //图像选择
     function getClearCloudCollection(collection, type) {

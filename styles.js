@@ -12,7 +12,7 @@ if (_G.loadedFiles[filePath] == null) {
     exports.imageParams = {
         "LANDSAT/LC08/C01/T1_SR": {
             des: "Landsat 8, Collection 1, Tier 1 + Real Time",
-            visParams: { bands: ["B4", "B3", "B2"], min: 0, max: 3000 },
+            visParams: { bands: ["B4", "B3", "B2"], min: 0, max: 2000 },
             bands: ["B1", "B2", "B3", "B4", "B5", "B6", "B7", "B10", "B11"],
             cloudBand : "pixel_qa",
             sortType: {
@@ -37,7 +37,6 @@ if (_G.loadedFiles[filePath] == null) {
             data.compositeParams = {};
             for(var key in data.visParams){
                 data.compositeParams[key] = data.visParams[key];
-                if(key == "max") { data.compositeParams[key] = data.visParams[key]/1.5; }
             }
         }
     }
