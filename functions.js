@@ -119,6 +119,30 @@ if (_G.loadedFiles[filePath] == null) {
         return value;
     };
 
+    //颜色
+    _G.getRandomColor = function (hasAlpha) {
+        var color = "#";
+        var length = 6;
+        for (var i = 0; i < length; ++i) {
+            color += Math.floor(Math.random() * 16).toString(16).toUpperCase();
+        }
+        if(hasAlpha) { color += "FF"; }
+        return color;
+    };
+
+    _G.isValidColor = function (color, hasAlpha) {
+        if (color == null || color == "") { return false; }
+        var startIndex = color[0] == '#' ? 1 : 0;
+        var numLength = hasAlpha ? 8 : 6;
+        if (color.length - startIndex != numLength) { return false; }
+    
+        for (var i = startIndex; i < color.length; ++i) {
+            var ch = color[i];
+            if (!(('0' <= ch && ch <= '9') || ('A' <= ch && ch <= 'F') || ('a' <= ch && ch <= 'f'))) { return false; }
+        }
+        return true;
+    };
+
     //地图
     _G.isClipImageName = function (imageName) {
         return imageName.startsWith(_G.clipImageHead);
@@ -246,24 +270,69 @@ if (_G.loadedFiles[filePath] == null) {
         return Map.addLayer(eeObject, visParams, name, shown, opacity);
     }
 
-    //颜色
-    var palette = [];
-    _G.getPalette = function (count) {
-        var arr = [];
-        var length = palette.length;
-        for (var i = 0; i < count; ++i) {
-            arr.push(i < length ? palette[i] : _G.getRandomColor());
-        }
-        return arr;
+    //Layer
+    _G.showTopMapLayer = function () {
+        var layers = Map.layers();
+        var length = layers.length();
+        if (length > 0) { layers.get(length - 1).setShown(true); }
     };
 
-    _G.getRandomColor = function () {
-        var color = "#";
-        var length = 6;
-        for (var i = 0; i < length; ++i) {
-            color += Math.floor(Math.random() * 16).toString(16).toUpperCase();
-        }
-        return color;
+    _G.hideAllMapLayer = function () {
+        Map.layers().forEach(function (layer) {
+            layer.setShown(false);
+        });
+    };
+
+    _G.clearMapLayer = function () {
+        Map.layers().reset();
+    };
+
+    //GeoLayer
+    var defaultDrawType = "point";
+    _G.clearMapGeoLayer = function () {
+        Map.drawingTools().layers().reset();
+    };
+
+    _G.removeCurrentMapGeoLayer = function () {
+        var layers = Map.drawingTools().layers();
+        var length = layers.length();
+        if (length > 0) { layers.remove(layers.get(length - 1)); }
+    };
+
+    _G.selectCurrentMapGeoLayer = function () {
+        var tools = Map.drawingTools()
+        var layers = tools.layers();
+        var length = layers.length();
+        if (length > 0) { tools.setSelected(layers.get(length - 1)); }
+    }
+
+    _G.reDrawCurrentMapGeoLayer = function () {
+        var tools = Map.drawingTools()
+        var layers = tools.layers();
+        var length = layers.length();
+        if (length == 0) { return; }
+        var layer = layers.get(length - 1);
+        var newLayer = ui.Map.GeometryLayer({
+            name: layer.getName(),
+            color: layer.getColor()
+        });
+        var shape = tools.getShape();
+        if (shape == null || shape == "") { shape = defaultDrawType; }
+        layers.remove(layer);
+        layers.add(newLayer);
+        tools.setSelected(newLayer);
+        tools.setShape(shape);
+    };
+
+    _G.newDrawMapGeoLayer = function () {
+        var tools = Map.drawingTools()
+        var layers = tools.layers();
+        var newLayer = ui.Map.GeometryLayer({ color: _G.getRandomColor() });
+        var shape = tools.getShape();
+        if (shape == null || shape == "") { shape = defaultDrawType; }
+        layers.add(newLayer);
+        tools.setSelected(newLayer);
+        tools.setShape(shape);
     };
 }
 else {

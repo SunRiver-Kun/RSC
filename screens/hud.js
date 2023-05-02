@@ -5,6 +5,14 @@ if (_G.loadedFiles[filePath] == null) {
     print("Load " + filePath);
 
     var ToolBox = require("users/sunriverkun/gee_test:widgets/toolBox.js");
+    var leftTopMapStyle = {
+        position: "top-left",
+        padding: "0px"
+    };
+    var rightTopMapStyle = {
+        position: "top-right",
+        padding: "0px"
+    }
 
     exports.new = function () {
         var panel = ui.root;
@@ -17,21 +25,42 @@ if (_G.loadedFiles[filePath] == null) {
 
         self.leftStack = [];
         self.leftTotalPanel = ui.Panel(null, ui.Panel.Layout.flow("vertical"), { shown: false });
-        self.leftEscButton = ui.Button("╳", _G.handler(self, exports.clearLeftScreen), false, { margin: "auto auto auto 0px", padding:"0px" });
-        self.leftBackButton = ui.Button("←", function () { exports.popLeftScreen(self); }, false, { margin: "auto 0px auto auto", padding:"0px"  });
+        self.leftEscButton = ui.Button("╳", _G.handler(self, exports.clearLeftScreen), false, { margin: "auto auto auto 0px", padding: "0px" });
+        self.leftBackButton = ui.Button("←", function () { exports.popLeftScreen(self); }, false, { margin: "auto 0px auto auto", padding: "0px" });
         self.leftPanel = ui.Panel(null, ui.Panel.Layout.flow("horizontal"));
 
         self.leftTotalPanel.add(_G.horizontals([self.leftEscButton, self.leftBackButton], true));
         self.leftTotalPanel.add(self.leftPanel);
 
         self.map = Map;
+        self.map.setControlVisibility({ zoomControl: false });
+
+        self.setMapGeoLayerButton = ui.Button("几何层设置", _G.handler(self, exports.onSetMapGeoLayerButtonClick), undefined, leftTopMapStyle, "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/settings/default/24px.svg");
+        self.newDrawMapGeoLayerButton = ui.Button("新建几何层", _G.newDrawMapGeoLayer, undefined, leftTopMapStyle, "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/new_window/default/24px.svg");
+        self.reDrawCurrentMapGeoLayerButton = ui.Button("重绘当前几何层", _G.reDrawCurrentMapGeoLayer, undefined, leftTopMapStyle, "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/cleaning_services/default/24px.svg");
+        self.removeCurrentMapGeoLayerButton = ui.Button("删除当前几何层", function () {
+            _G.removeCurrentMapGeoLayer();
+            _G.selectCurrentMapGeoLayer();
+        }, undefined, leftTopMapStyle, "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/restore_from_trash/default/24px.svg");
+        self.map.add(self.setMapGeoLayerButton);
+        self.map.add(self.newDrawMapGeoLayerButton);
+        self.map.add(self.reDrawCurrentMapGeoLayerButton);
+        self.map.add(self.removeCurrentMapGeoLayerButton);
+
+        self.showTopMapLayerButton = ui.Button("显示顶部图层", _G.showTopMapLayer, undefined, rightTopMapStyle, "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/visibility/default/24px.svg");
+        self.hideAllMapLayerButton = ui.Button("隐藏全部图层", _G.hideAllMapLayer, undefined, rightTopMapStyle, "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/visibility_off/default/24px.svg");
+        self.clearMapLayerButton = ui.Button("删除全部图层", _G.clearMapLayer, undefined, rightTopMapStyle, "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/delete/default/24px.svg");
+        self.map.add(self.showTopMapLayerButton);
+        self.map.add(self.hideAllMapLayerButton);
+        self.map.add(self.clearMapLayerButton);
 
         self.rightStack = {};  //name : {button  screen}
         self.rightTotalPanel = ui.Panel(null, ui.Panel.Layout.flow("horizontal"));
-        exports.addRightWidget(self, "💼工具栏", ToolBox.new(), true);
 
         panel.insert(0, self.leftTotalPanel);
         panel.add(self.rightTotalPanel);
+
+        exports.addRightWidget(self, "💼工具栏", ToolBox.new(), true);
 
         return self;
     };
@@ -75,17 +104,22 @@ if (_G.loadedFiles[filePath] == null) {
         self.leftTotalPanel.style().set("shown", widgetStack.length > 0);
     };
 
+    //map
+    exports.onSetMapGeoLayerButtonClick = function (self) {
+
+    };
+
     //right
     exports.addRightWidget = function (self, name, widget, shown) {
         if (self.rightStack[name]) { print("[ERROR]: " + name + " is in Hud.rightStack!"); return; }
         if (widget.widget) { widget = widget.widget; }
 
-        var panel = ui.Panel(null, ui.Panel.Layout.flow("vertical"), { shown: shown });
+        var panel = ui.Panel(null, ui.Panel.Layout.flow("vertical"), { shown: shown, width: "150px" });
         var titlePanel = ui.Panel(null, ui.Panel.Layout.flow("horizontal"));
-        titlePanel.add(ui.Label(name, {fontSize : "20px", backgroundColor: "FFFFFF00"}));
+        titlePanel.add(ui.Label(name, { fontSize: "20px", backgroundColor: "FFFFFF00" }));
         var closePng = "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/close/default/24px.svg";
         titlePanel.add(ui.Button("", function () { exports.hideRightWidget(self, name); }, false, {
-            margin:"0px 0px auto auto", padding:"0px", backgroundColor:"#FFFFFF00"
+            margin: "0px 0px auto auto", padding: "0px"
         }, closePng));
 
         panel.add(titlePanel);
