@@ -4,6 +4,8 @@ if (_G.loadedFiles[filePath] == null) {
     _G.loadedFiles[filePath] = exports;
     print("Load " + filePath);
 
+
+    var GeometrySettingScreen = require("users/sunriverkun/gee_test:screens/geometrySettingScreen.js");
     var ToolBox = require("users/sunriverkun/gee_test:widgets/toolBox.js");
     var leftTopMapStyle = {
         position: "top-left",
@@ -35,13 +37,10 @@ if (_G.loadedFiles[filePath] == null) {
         self.map = Map;
         self.map.setControlVisibility({ zoomControl: false });
 
-        self.setMapGeoLayerButton = ui.Button("几何层设置", _G.handler(self, exports.onSetMapGeoLayerButtonClick), undefined, leftTopMapStyle, "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/settings/default/24px.svg");
+        self.setMapGeoLayerButton = ui.Button("几何层设置", function () { _G.pushScreen(GeometrySettingScreen.new()); }, undefined, leftTopMapStyle, "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/settings/default/24px.svg");
         self.newDrawMapGeoLayerButton = ui.Button("新建几何层", _G.newDrawMapGeoLayer, undefined, leftTopMapStyle, "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/new_window/default/24px.svg");
         self.reDrawCurrentMapGeoLayerButton = ui.Button("重绘当前几何层", _G.reDrawCurrentMapGeoLayer, undefined, leftTopMapStyle, "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/cleaning_services/default/24px.svg");
-        self.removeCurrentMapGeoLayerButton = ui.Button("删除当前几何层", function () {
-            _G.removeCurrentMapGeoLayer();
-            _G.selectCurrentMapGeoLayer();
-        }, undefined, leftTopMapStyle, "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/restore_from_trash/default/24px.svg");
+        self.removeCurrentMapGeoLayerButton = ui.Button("删除当前几何层", function () { _G.removeCurrentMapGeoLayer(); _G.selectCurrentMapGeoLayer(); }, undefined, leftTopMapStyle, "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/restore_from_trash/default/24px.svg");
         self.map.add(self.setMapGeoLayerButton);
         self.map.add(self.newDrawMapGeoLayerButton);
         self.map.add(self.reDrawCurrentMapGeoLayerButton);
@@ -102,11 +101,6 @@ if (_G.loadedFiles[filePath] == null) {
             widgetStack.pop();
         }
         self.leftTotalPanel.style().set("shown", widgetStack.length > 0);
-    };
-
-    //map
-    exports.onSetMapGeoLayerButtonClick = function (self) {
-
     };
 
     //right

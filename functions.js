@@ -24,14 +24,36 @@ if (_G.loadedFiles[filePath] == null) {
 
 
     //UI
+    _G.add = function (parent, child) {
+        if (parent.widget != null) { parent = parent.widget; }
+        if (child.widget != null) { child = child.widget; }
+        parent.add(child);
+        return parent;
+    };
+
+    _G.remove = function (parent, child) {
+        if (parent.widget != null) { parent = parent.widget; }
+        if (child.widget != null) { child = child.widget; }
+        parent.remove(child);
+        return parent;
+    };
+
+    _G.clear = function (widget) {
+        if (widget.widget != null) { widget = widget.widget; }
+        widget.clear();
+        return widget;
+    };
+
     _G.show = function (widget) {
         if (widget.widget != null) { widget = widget.widget; }
         widget.style().set("shown", true);
+        return widget;
     };
 
     _G.hide = function (widget) {
         if (widget.widget != null) { widget = widget.widget; }
         widget.style().set("shown", false);
+        return widget;
     };
 
     _G.handler = function (self, fn) {
@@ -126,7 +148,7 @@ if (_G.loadedFiles[filePath] == null) {
         for (var i = 0; i < length; ++i) {
             color += Math.floor(Math.random() * 16).toString(16).toUpperCase();
         }
-        if(hasAlpha) { color += "FF"; }
+        if (hasAlpha) { color += "FF"; }
         return color;
     };
 
@@ -135,7 +157,7 @@ if (_G.loadedFiles[filePath] == null) {
         var startIndex = color[0] == '#' ? 1 : 0;
         var numLength = hasAlpha ? 8 : 6;
         if (color.length - startIndex != numLength) { return false; }
-    
+
         for (var i = startIndex; i < color.length; ++i) {
             var ch = color[i];
             if (!(('0' <= ch && ch <= '9') || ('A' <= ch && ch <= 'F') || ('a' <= ch && ch <= 'f'))) { return false; }
