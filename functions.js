@@ -4,7 +4,7 @@ if (_G.loadedFiles[filePath] == null) {
     _G.loadedFiles[filePath] = _G;
     print("Load " + filePath);
 
-    //TheFrontEnd
+    //Hud
     _G.getWidgetStack = function () {
         return _G.hud.leftStack;
     };
@@ -22,6 +22,9 @@ if (_G.loadedFiles[filePath] == null) {
         _G.hud.c.clearLeftScreen(_G.hud);
     };
 
+    _G.generateLegend = function (colors, names) {
+        _G.hud.c.generateLegend(_G.hud, colors, names);
+    };
 
     //UI
     _G.add = function (parent, child) {

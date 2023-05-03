@@ -103,6 +103,23 @@ if (_G.loadedFiles[filePath] == null) {
         self.leftTotalPanel.style().set("shown", widgetStack.length > 0);
     };
 
+    //map
+    exports.generateLegend = function (self, colors, names) {
+        if (self.mapLegend != null) {
+            self.map.remove(self.mapLegend);
+            self.mapLegend = null;
+        }
+        if (colors == null || names == null || colors.length != names.length) { print("[ERROR]: Hud.generateLegend() colors和name不等长"); return; }
+        var panel = ui.Panel(null, ui.Panel.Layout.flow("vertical"), { position: "bottom-left" });
+        for (var i = 0; i < colors.length; ++i) {
+            var colorLabel = ui.Label("", { padding: "12px", backgroundColor: colors[i] });
+            var nameLabel = ui.Label(names[i]);
+            panel.add(_G.horizontals([colorLabel, nameLabel], true));
+        }
+        self.mapLegend = panel;
+        self.map.add(panel);
+    };
+
     //right
     exports.addRightWidget = function (self, name, widget, shown) {
         if (self.rightStack[name]) { print("[ERROR]: " + name + " is in Hud.rightStack!"); return; }

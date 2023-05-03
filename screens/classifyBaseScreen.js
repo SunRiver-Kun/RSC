@@ -6,6 +6,7 @@ if (_G.loadedFiles[filePath] == null) {
 
     var ImageChooser = require("users/sunriverkun/gee_test:widgets/imageChooser.js");
     var MapDrawer = require("users/sunriverkun/gee_test:widgets/mapDrawer.js");
+    var ColorNameSettingScreen = require("users/sunriverkun/gee_test:screens/colorNameSettingScreen.js");
 
     var divCh = ";";
     var classProperty = "landcover";
@@ -51,6 +52,12 @@ if (_G.loadedFiles[filePath] == null) {
         self.pointsOkLabel = ui.Label("");
         panel.add(_G.horizontals([self.pointsLabel, self.pointsButton, self.pointsOkLabel]));
 
+        //图例
+        self.legendNames = null;  //self.classifyVisParams.palette
+        self.legendCheck = ui.Checkbox("生成图例", true);
+        self.legendButton = ui.Button("图例设置", _G.handler(self, exports.onLegendButtonClick));
+        panel.add(_G.horizontals([self.legendCheck, self.legendButton]));
+
         //分类，取消
         self.classButton = ui.Button("分类", _G.handler(self, exports.onClass));
         self.cancelButton = ui.Button("取消", function () { _G.popScreen(); });
@@ -91,25 +98,43 @@ if (_G.loadedFiles[filePath] == null) {
 
     exports.getClassifyVisParams = function (self) {
         return self.classifyVisParams;
-    }
+    };
 
     exports.getShowImage = function (self, zoom) {
         return ImageChooser.getShowImage(self.imageChooser, zoom);
-    }
+    };
+
+    exports.generateLegend = function (self) {
+        var colors = self.classifyVisParams.palette;
+        var names = self.legendNames;
+        _G.generateLegend(colors, names);
+    };
 
     exports.openMapDrawScreen = function (self) {
         if (exports.getShowImage(self, 10) == null) { return; }
         var mapDrawScreen = MapDrawer.new({ title: "请绘制样板点", des: "(每个图层一个样板类型)" }, function (geoLayers) {
             var length = geoLayers.length();
             var palette = [];
+            var names = [];
             for (var i = 0; i < length; ++i) {
-                palette.push(geoLayers.get(i).getColor());
+                var layer = geoLayers.get(i)
+                palette.push(layer.getColor());
+                names.push(layer.getName());
             }
             self.classifyVisParams.max = length > 0 ? length - 1 : 0;
             self.classifyVisParams.palette = palette;
+            self.legendNames = names;
 
             exports.setPoints(self, length > 0 ? Map.drawingTools().toFeatureCollection(classProperty) : null);
         }, null, true, "point");
+    };
+
+    exports.onLegendButtonClick = function (self) {
+        var colors = self.classifyVisParams.palette;
+        var names = self.legendNames;
+        if (exports.getPoints(self) == null || colors == null || names == null) { alert("需要先设置样板点，才能设置图例"); return; }
+        var screen = ColorNameSettingScreen.new(colors, names, "图例设置");
+        _G.pushScreen(screen);
     };
 
     //abstract
@@ -122,13 +147,15 @@ if (_G.loadedFiles[filePath] == null) {
         if (points == null) { alert("未绘制样板点"); return; }
 
         var bands = exports.getBands(self);
-        if(bands==null || bands.length == 0) { alert("未填写分类波段名称"); return; }
+        if (bands == null || bands.length == 0) { alert("未填写分类波段名称"); return; }
 
         var classifier = self.c.getClassifier(self);
         if (classifier == null) { return; }
 
         var image = exports.getShowImage(self);
         if (image == null) { return; }
+
+        if (self.legendCheck.getValue()) { exports.generateLegend(self); }
 
         var classProperty = exports.getClassProperty();
 
