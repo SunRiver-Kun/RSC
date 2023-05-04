@@ -14,6 +14,7 @@ if (_G.loadedFiles[filePath] == null) {
     var defaultCollectionType = "LANDSAT/LC08/C01/T1_SR";
     var noneType = "_none_";
     var intersectType = "_intersect_";
+    var maxImageCount = 100;
 
 
     exports.new = function (onChooseClick, collectionTypes, defaultType) {
@@ -101,7 +102,7 @@ if (_G.loadedFiles[filePath] == null) {
 
 
     exports.onCompositeSelectChange = function (self, type) {
-        var isComposite = type=="合成影像";
+        var isComposite = type == "合成影像";
         self.clearCloudCheck.setValue(isComposite);
     }
 
@@ -133,11 +134,15 @@ if (_G.loadedFiles[filePath] == null) {
         var typeData = self.cltTypes[type];
         var cloud = typeData.sortType.cloud;
         var sortType = self.cltSortSelect.getValue();
+        var isComposite = self.compositeSelect.getValue() == "合成影像"
 
+        //基本选择
         var collection = ee.ImageCollection(type)
             .filterDate(self.startTimeTex.getValue(), self.endTimeTex.getValue())
-            .filter(ee.Filter.lte(cloud, cloudValue));
+            .filter(ee.Filter.lte(cloud, cloudValue))
         if (geometry != null) { collection = collection.filterBounds(geometry); }
+
+        //排序
         if (sortType == intersectType) {
             if (geometry == null) { alert("未绘制研究区域，无法根据相交区域排序"); return; }
             else {
@@ -152,15 +157,19 @@ if (_G.loadedFiles[filePath] == null) {
         }
         if (sortType != null && sortType != noneType && sortType != intersectType) { collection = collection.sort(typeData.sortType[sortType], self.cltAscendingCheck.getValue()); }
 
+        //限制数量
+        if (!isComposite) { collection = collection.limit(maxImageCount); }
+
+        //去云
         if (self.clearCloudCheck.getValue()) { collection = getClearCloudCollection(collection, type); }
 
         var viewr = null;
-        if (self.compositeSelect.getValue() == "合成影像") {
+        if (isComposite) {
             var visParams = _G.getImageVisualParams(type + _G.compositeImageTail);
             viewr = ImageCollectionCompositer.new(collection, visParams, visParams, geometry, self.onChooseClick, null, type);
         } else {
             var visParams = _G.getImageVisualParams(type + "/name");
-            viewr = ImageCollectionViewr.new(collection, visParams, visParams, geometry, self.onChooseClick);
+            viewr = ImageCollectionViewr.new(collection, visParams, visParams, geometry, self.onChooseClick, null, maxImageCount - 1);
         }
 
         self.resultPanel.clear();

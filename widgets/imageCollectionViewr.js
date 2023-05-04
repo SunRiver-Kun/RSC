@@ -4,7 +4,7 @@ if (_G.loadedFiles[filePath] == null) {
     _G.loadedFiles[filePath] = exports;
     print("Load " + filePath);
 
-    exports.new = function (collection, visParams, thumbnailParams, clipGeo, onChooseClick, onDownloadClick) {
+    exports.new = function (collection, visParams, thumbnailParams, clipGeo, onChooseClick, onDownloadClick, showMaxCount) {
         var panel = ui.Panel();
         panel.setLayout(ui.Panel.Layout.flow("vertical"));
         var self = {
@@ -17,7 +17,8 @@ if (_G.loadedFiles[filePath] == null) {
             selectedIndex: null,
             image: null,
             imageId: null,
-            readyToChoose: false
+            readyToChoose: false,
+            showMaxCount: showMaxCount
         };
         self.prevButton = ui.Button("上一张", _G.handler(self, exports.onPrevButtonClick), true);
         self.nextButton = ui.Button("下一张", _G.handler(self, exports.onNextButtonClick), true);
@@ -88,7 +89,10 @@ if (_G.loadedFiles[filePath] == null) {
         _G.show(self.thumbnail);
 
         // Asynchronously update the image information.
-        self.orderLabel.setValue("Index: " + (index + 1) + "/" + self.collectionLength);
+        var indexStr = "Index: " + (index + 1) + "/";
+        if (self.showMaxCount && self.showMaxCount < self.collectionLength) { indexStr += self.showMaxCount + "+"; }
+        else { indexStr += self.collectionLength; }
+        self.orderLabel.setValue(indexStr);
         image.get("system:id").evaluate(function (id) {
             self.imageId = id;
             self.idLabel.setValue("ID: " + id);
