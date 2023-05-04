@@ -48,7 +48,7 @@ if (_G.loadedFiles[filePath] == null) {
 
         self.showTopMapLayerButton = ui.Button("显示顶部图层", _G.showTopMapLayer, undefined, rightTopMapStyle, "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/visibility/default/24px.svg");
         self.hideAllMapLayerButton = ui.Button("隐藏全部图层", _G.hideAllMapLayer, undefined, rightTopMapStyle, "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/visibility_off/default/24px.svg");
-        self.clearMapLayerButton = ui.Button("删除全部图层", _G.clearMapLayer, undefined, rightTopMapStyle, "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/delete/default/24px.svg");
+        self.clearMapLayerButton = ui.Button("删除全部图层和图例", function () { _G.clearMapLayer(); exports.removeLegend(self); }, undefined, rightTopMapStyle, "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/delete/default/24px.svg");
         self.map.add(self.showTopMapLayerButton);
         self.map.add(self.hideAllMapLayerButton);
         self.map.add(self.clearMapLayerButton);
@@ -104,11 +104,15 @@ if (_G.loadedFiles[filePath] == null) {
     };
 
     //map
-    exports.generateLegend = function (self, colors, names) {
+    exports.removeLegend = function (self) {
         if (self.mapLegend != null) {
             self.map.remove(self.mapLegend);
             self.mapLegend = null;
         }
+    };
+
+    exports.generateLegend = function (self, colors, names) {
+        exports.removeLegend(self);
         if (colors == null || names == null || colors.length != names.length) { print("[ERROR]: Hud.generateLegend() colors和name不等长"); return; }
         var panel = ui.Panel(null, ui.Panel.Layout.flow("vertical"), { position: "bottom-left" });
         for (var i = 0; i < colors.length; ++i) {

@@ -16,14 +16,14 @@ if (_G.loadedFiles[filePath] == null) {
         };
 
 
-        panel.add(ui.Label("几何体导出",  _G.styles.totalTitle));
+        panel.add(ui.Label("kml/kmz导出",  _G.styles.totalTitle));
         //绘图
         self.featureDrawer = FeatureDrawer.new();
         panel.add(ui.Label("🎨导出区域", _G.styles.title));
         panel.add(self.featureDrawer.widget);
 
         //导出设置
-        self.formatSelect = ui.Select(["csv", "geojson", "kml", "kmz"], "选择导出格式", "csv");
+        self.formatSelect = ui.Select(["kml", "kmz","csv", "geojson"], "选择导出格式", "kml");
         self.filenameTex = ui.Textbox("请输入文件名", "feature");
         self.downLoadButton = ui.Button("获取下载链接", _G.handler(self, exports.onDownLoadButtonClick));
         self.downLoadLabel = ui.Label("", { shown: false });
