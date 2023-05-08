@@ -59,6 +59,10 @@ if (_G.loadedFiles[filePath] == null) {
         }
     };
 
+    exports.getImageName = function (self) {
+        return self.imageNameTex.getValue();
+    };
+
     exports.setImageName = function (self, name) {
         self.imageName = name;
         self.imageNameTex.setValue(name);

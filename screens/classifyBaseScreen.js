@@ -7,6 +7,7 @@ if (_G.loadedFiles[filePath] == null) {
     var ImageChooser = require("users/sunriverkun/gee_test:widgets/imageChooser.js");
     var MapDrawer = require("users/sunriverkun/gee_test:widgets/mapDrawer.js");
     var ColorNameSettingScreen = require("users/sunriverkun/gee_test:screens/colorNameSettingScreen.js");
+    var ImageExportScreen = require("users/sunriverkun/gee_test:screens/imageExportScreen.js");
 
     var divCh = ";";
     var classProperty = "landcover";
@@ -60,8 +61,8 @@ if (_G.loadedFiles[filePath] == null) {
 
         //分类，取消
         self.classButton = ui.Button("分类", _G.handler(self, exports.onClass));
-        self.cancelButton = ui.Button("取消", function () { _G.popScreen(); });
-        panel.add(_G.horizontals([self.classButton, self.cancelButton]));
+        self.downLoadButton = ui.Button("导出", _G.handler(self, exports.onDownLoadButtonClick));
+        panel.add(_G.horizontals([self.classButton, self.downLoadButton]));
 
 
         exports.setPoints(self, null);
@@ -174,6 +175,9 @@ if (_G.loadedFiles[filePath] == null) {
         print("classified", classified);
         Map.centerObject(classified);
         Map.addLayer(classified, exports.getClassifyVisParams(self), self.title);
+
+        self.image = image;
+        self.classified = classified;
     };
 
     exports.setArgsWidget = function (self, argsWidget) {
@@ -182,6 +186,22 @@ if (_G.loadedFiles[filePath] == null) {
             self.argsPanel.clear();
             self.argsPanel.add(argsWidget);
         }
+    };
+
+    exports.onDownLoadButtonClick = function (self) {
+        var image = exports.getShowImage(self);
+        if (image == null && self.classified == null) { alert("无可导出图像"); return; }
+        
+        var data = {};
+        if (image) {
+            var name = ImageChooser.getImageName(self.imageChooser);
+            data[name] = { image: image, bands: _G.getImageBands(name) };
+        }
+        if (self.classified) {
+            data["classified"] = { image: self.classified, bands: ["classification"] };
+        }
+        var imageExportScreen = ImageExportScreen.new(data);
+        _G.pushScreen(imageExportScreen);
     };
 
 } else {

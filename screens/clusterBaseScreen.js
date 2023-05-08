@@ -6,6 +6,7 @@ if (_G.loadedFiles[filePath] == null) {
 
     var MapDrawer = require("users/sunriverkun/gee_test:widgets/mapDrawer.js");
     var ImageChooser = require("users/sunriverkun/gee_test:widgets/imageChooser.js");
+    var ImageExportScreen = require("users/sunriverkun/gee_test:screens/imageExportScreen.js");
     var divCh = ";";
 
     exports.new = function (title, titleDes) {
@@ -48,8 +49,8 @@ if (_G.loadedFiles[filePath] == null) {
 
         //分类，取消
         self.classButton = ui.Button("分类", _G.handler(self, exports.onClass));
-        self.cancelButton = ui.Button("取消", function () { _G.popScreen(); });
-        panel.add(_G.horizontals([self.classButton, self.cancelButton]));
+        self.downLoadButton = ui.Button("导出", _G.handler(self, exports.onDownLoadButtonClick));
+        panel.add(_G.horizontals([self.classButton, self.downLoadButton]));
         
         panel.add(ui.Label("当影像过大时，可以选择绘制训练区域和减少分类波段数。", _G.styles.des));
 
@@ -128,6 +129,7 @@ if (_G.loadedFiles[filePath] == null) {
         print("training", training);
         var clusterer = classifier.train(training, bands);
         var result = image.cluster(clusterer);
+        self.clustered = result;
         print("result", result);
 
         result = result.randomVisualizer();
@@ -140,6 +142,22 @@ if (_G.loadedFiles[filePath] == null) {
             self.argsPanel.clear();
             self.argsPanel.add(argsWidget);
         }
+    };
+
+    exports.onDownLoadButtonClick = function (self) {
+        var image = exports.getShowImage(self);
+        if (image == null && self.clustered == null) { alert("无可导出图像"); return; }
+        
+        var data = {};
+        if (image) {
+            var name = ImageChooser.getImageName(self.imageChooser);
+            data[name] = { image: image, bands: _G.getImageBands(name) };
+        }
+        if (self.clustered) {
+            data["clustered"] = { image: self.clustered, bands: ["cluster"] };
+        }
+        var imageExportScreen = ImageExportScreen.new(data);
+        _G.pushScreen(imageExportScreen);
     };
 
 } else {
