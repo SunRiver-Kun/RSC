@@ -11,6 +11,7 @@ var XMeansScreen = require("users/sunriverkun/gee_test:screens/xMeansScreen.js")
 var LVQScreen = require("users/sunriverkun/gee_test:screens/lVQScreen.js");
 
 //数据管理
+var ImageExportScreen = require("users/sunriverkun/gee_test:screens/imageExportScreen.js");
 var FeatureExportScreen = require("users/sunriverkun/gee_test:screens/featureExportScreen.js");
 
 //Widget
@@ -64,6 +65,7 @@ exports.new = function () {
 
     var fileMenu = SubMenu.new("📁数据管理", undefined, subPanelStyle);
     panel.add(fileMenu.widget);
+    addMenuItem(MenuItem.new("图像导出", ImageExportScreen), fileMenu);
     addMenuItem(MenuItem.new("kml/kmz导出", FeatureExportScreen), fileMenu);
 
 
