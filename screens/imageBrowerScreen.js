@@ -31,7 +31,7 @@ if (_G.loadedFiles[filePath] == null) {
         var menu = null;
         var titleStyle = _G.styles.title;
 
-        panel.add(ui.Label("图像选择界面", _G.styles.totalTitle));
+        panel.add(ui.Label("遥感图像选择界面", _G.styles.totalTitle));
         //类型
         self.cltTypes = collectionTypes;
         self.cltTypeDesLabel = ui.Label(collectionTypes[defaultType].des != null ? collectionTypes[defaultType].des : "", _G.styles.des);

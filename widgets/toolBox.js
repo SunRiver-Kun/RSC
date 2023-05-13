@@ -66,7 +66,7 @@ exports.new = function () {
     var fileMenu = SubMenu.new("📁数据管理", undefined, subPanelStyle);
     panel.add(fileMenu.widget);
     addMenuItem(MenuItem.new("图像导出", ImageExportScreen), fileMenu);
-    addMenuItem(MenuItem.new("kml/kmz导出", FeatureExportScreen), fileMenu);
+    addMenuItem(MenuItem.new("绘图导出", FeatureExportScreen), fileMenu);
 
 
     return self;

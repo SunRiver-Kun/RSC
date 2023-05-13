@@ -33,7 +33,7 @@ if (_G.loadedFiles[filePath] == null) {
         self.cityTex = ui.Textbox("以；分割不同市", "");
         self.cityButton = ui.Button("补全", _G.handler(self, exports.onCityButtonClick));
 
-        panel.add(ui.Label("选择自定义/省/市一种或多种做为导出区域", _G.styles.des));
+        panel.add(ui.Label("可选择自定义/省/市一种或多种", _G.styles.des));
         panel.add(_G.horizontals([ui.Label("自定义"), self.customAreaButotn, self.customAreaClearButton, self.areaPreviewButton], true));
         panel.add(_G.horizontals([ui.Label("+ 省"), self.provinceTex, self.provinceButton], true));
         panel.add(_G.horizontals([ui.Label("+ 市"), self.cityTex, self.cityButton], true));

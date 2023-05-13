@@ -16,7 +16,7 @@ if (_G.loadedFiles[filePath] == null) {
         };
 
 
-        panel.add(ui.Label("kml/kmz导出",  _G.styles.totalTitle));
+        panel.add(ui.Label("绘图导出界面",  _G.styles.totalTitle));
         //绘图
         self.featureDrawer = FeatureDrawer.new();
         panel.add(ui.Label("🎨导出区域", _G.styles.title));
