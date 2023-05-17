@@ -37,6 +37,12 @@ if (_G.loadedFiles[filePath] == null) {
         panel.add(_G.horizontals([ui.Label("波段名"), self.bandsTex]));
         panel.add(_G.horizontals([ui.Label("缩放(米/像素)"), self.scaleTex]));
         panel.add(_G.horizontals([ui.Label("导出类型"), self.typeSelect]));
+
+        if(_G.isEditor){
+            self.exportButton = ui.Button("导出到云盘", _G.handler(self, exports.onExportButtonClick));
+            panel.add(self.exportButton);
+        }
+
         panel.add(_G.horizontals([self.downLoadButton, self.downLoadLabel]));
         panel.add(self.errorLabel);
 
@@ -111,6 +117,23 @@ if (_G.loadedFiles[filePath] == null) {
                 self.errorLabel.setValue(errorStr);
                 _G.show(self.errorLabel);
             }
+        });
+    };
+
+    exports.onExportButtonClick = function (self) {
+        var bands = exports.getBands(self);
+        if (bands == null || bands.length == 0) { alert("波段名不能为空"); return; }
+
+        var image = exports.getImage(self);
+        var scale = _G.Astr2PInt(self.scaleTex.getValue(), "缩放比例应为正整数");
+        if (image == null || scale == null) { return; }
+
+        image = image.select(bands);
+        Export.image.toDrive({
+            image: image,
+            description: self.filenameTex.getValue(),
+            scale: scale,
+            maxPixels: 2e9  //最大导出像素好事是1e13
         });
     };
 
